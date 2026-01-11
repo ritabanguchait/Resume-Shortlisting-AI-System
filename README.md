@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Resume Shortlisting & Job Matching System
 
 ## Project Overview
@@ -43,3 +44,7 @@ A professional web application for HR and Interviewers to:
 The system uses **TF-IDF (Term Frequency-Inverse Document Frequency)** and **Cosine Similarity** to compare the job description text with the extracted text from resumes.
 - **Skill Extraction**: Parses text for known technical skills.
 - **Match Percentage**: Cosine similarity score normalized to a percentage.
+=======
+# Resume-Shortlisting-AI-CSystem
+AI-powered Resume Shortlisting and Job Matching System that automates bulk resume screening using NLP and Machine Learning. Allows HR to upload multiple resumes, analyze skills, calculate match scores, and shortlist or reject candidates with clear pros, cons, and missing skills. Built with Node.js, Python, and a modern, card-based web interface.
+>>>>>>> bfb731f39636edd05fa2a448d3af5a64b484d691
