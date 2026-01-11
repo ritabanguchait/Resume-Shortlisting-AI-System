@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+</head>
+<body>
+    <div id="app">
+        <!-- Navbar -->
+         <nav class="navbar">
+             <div class="navbar-content">
+                <a href="#" onclick="window.location.reload(); return false;" class="brand">
+                    <span style="font-size: 1.5rem;">⚡</span> ResumeAI
+                </a>
+                <div style="font-weight: 600; color: var(--secondary);">Analysis Results</div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="controls-bar">
+                <button onclick="window.location.reload()" class="btn btn-secondary">← Start Over</button>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <strong>Filter Results: </strong>
+                    <select id="filterSelect" class="filter-select">
+                        <option value="all">All Candidates</option>
+                        <option value="Shortlisted">✅ Shortlisted</option>
+                        <option value="Rejected">❌ Rejected</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="resultsContainer" class="results-grid">
+                <!-- Results will be injected here via JS -->
+            </div>
+            
+            <div id="noResults" style="display:none; text-align: center; color: var(--text-muted); padding: 4rem;">
+                <h3>No results found matching your criteria.</h3>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
