@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test - ResumeAI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .test-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .test-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Authentication Test Page</h1>
+        <p>Use this page to test authentication and cookie handling.</p>
+
+        <!-- Test 1: Login -->
+        <div class="test-section">
+            <h3>Test 1: Login</h3>
+            <input type="email" id="testEmail" placeholder="Email" value="test@example.com" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;">
+            <input type="password" id="testPassword" placeholder="Password" value="password123" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;">
+            <button onclick="testLogin()" class="btn btn-primary">Test Login</button>
+            <div id="loginResult" class="test-result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 2: Check Session -->
+        <div class="test-section">
+            <h3>Test 2: Check Session (/api/auth/me)</h3>
+            <button onclick="testSession()" class="btn btn-secondary">Check Session</button>
+            <div id="sessionResult" class="test-result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 3: Check Cookies -->
+        <div class="test-section">
+            <h3>Test 3: Browser Cookies</h3>
+            <button onclick="checkCookies()" class="btn btn-secondary">Check Cookies</button>
+            <div id="cookieResult" class="test-result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 4: Test Protected Route -->
+        <div class="test-section">
+            <h3>Test 4: Protected Route (/api/ping)</h3>
+            <button onclick="testProtectedRoute()" class="btn btn-secondary">Test Route</button>
+            <div id="routeResult" class="test-result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing login...';
+            resultDiv.className = 'test-result';
+
+            try {
+                const res = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: document.getElementById('testEmail').value,
+                        password: document.getElementById('testPassword').value
+                    }),
+                    credentials: 'include'
+                });
+
+                const data = await res.json();
+                
+                if (res.ok) {
+                    resultDiv.className = 'test-result success';
+                    resultDiv.textContent = `✅ Login successful!\nUser: ${JSON.stringify(data.user, null, 2)}`;
+                } else {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.textContent = `❌ Login failed: ${data.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testSession() {
+            const resultDiv = document.getElementById('sessionResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking session...';
+            resultDiv.className = 'test-result';
+
+            try {
+                const res = await fetch('http://localhost:3000/api/auth/me', {
+                    credentials: 'include'
+                });
+
+                const data = await res.json();
+                
+                if (res.ok) {
+                    resultDiv.className = 'test-result success';
+                    resultDiv.textContent = `✅ Session valid!\nUser: ${JSON.stringify(data.user, null, 2)}`;
+                } else {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.textContent = `❌ Session invalid: ${data.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        function checkCookies() {
+            const resultDiv = document.getElementById('cookieResult');
+            resultDiv.style.display = 'block';
+            
+            const cookies = document.cookie;
+            
+            if (cookies) {
+                resultDiv.className = 'test-result success';
+                resultDiv.textContent = `Cookies found:\n${cookies}\n\nNote: httpOnly cookies won't appear here (that's correct for security)`;
+            } else {
+                resultDiv.className = 'test-result error';
+                resultDiv.textContent = `No cookies found in document.cookie\n\nNote: httpOnly cookies are hidden from JavaScript (this is normal and secure)`;
+            }
+        }
+
+        async function testProtectedRoute() {
+            const resultDiv = document.getElementById('routeResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing protected route...';
+            resultDiv.className = 'test-result';
+
+            try {
+                const res = await fetch('http://localhost:3000/api/ping', {
+                    credentials: 'include'
+                });
+
+                const data = await res.json();
+                
+                if (res.ok) {
+                    resultDiv.className = 'test-result success';
+                    resultDiv.textContent = `✅ Route accessible!\nResponse: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.textContent = `❌ Route failed: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -28,3 +28,32 @@ def clean_text(text):
     # Remove multiple spaces
     text = re.sub(r'\s+', ' ', text).strip()
     return text
+
+def extract_experience(text):
+    """
+    Extract years of experience from resume text.
+    Returns the maximum years found, or 0 if none detected.
+    """
+    if not text:
+        return 0
+    
+    # Common patterns for experience
+    patterns = [
+        r'(\d+)\+?\s*(?:years?|yrs?)\s+(?:of\s+)?experience',
+        r'experience\s+(?:of\s+)?(\d+)\+?\s*(?:years?|yrs?)',
+        r'(\d+)\+?\s*(?:years?|yrs?)\s+in',
+        r'worked\s+for\s+(\d+)\+?\s*(?:years?|yrs?)',
+    ]
+    
+    years_found = []
+    text_lower = text.lower()
+    
+    for pattern in patterns:
+        matches = re.findall(pattern, text_lower)
+        for match in matches:
+            try:
+                years_found.append(int(match))
+            except ValueError:
+                continue
+    
+    return max(years_found) if years_found else 0
