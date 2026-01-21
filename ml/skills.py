@@ -36,3 +36,25 @@ def identify_missing_skills(job_desc_text, candidate_skills):
     missing = [skill for skill in jd_skills if skill not in candidate_skills]
     return missing, jd_skills
 
+def identify_extra_skills(job_desc_text, candidate_skills):
+    """
+    Identify skills the candidate has that are not in the job description.
+    These are 'bonus' skills.
+    """
+    jd_skills = extract_skills(job_desc_text)
+    extra = [skill for skill in candidate_skills if skill not in jd_skills]
+    return extra
+
+def calculate_skill_match_score(job_desc_text, candidate_skills):
+    """
+    Calculate skill match percentage.
+    Returns a score between 0-100 based on how many JD skills the candidate has.
+    """
+    jd_skills = extract_skills(job_desc_text)
+    if not jd_skills:
+        return 0.0
+    
+    matched_count = sum(1 for skill in jd_skills if skill in candidate_skills)
+    return (matched_count / len(jd_skills)) * 100
+
+

@@ -18,7 +18,7 @@
                 </a>
                 <div>
                     <a href="#features" class="btn btn-secondary" style="border:none; box-shadow:none;">Features</a>
-                    <a href="#upload-section" class="btn btn-primary">Get Started</a>
+                    <a onclick="App.loadPage('signup.html'); return false;" class="btn btn-primary" style="cursor: pointer;">Get Started</a>
                 </div>
             </div>
         </nav>
@@ -31,7 +31,7 @@
                     <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Hire the Best Talent,<br>In Seconds.</h1>
                     <p style="font-size: 1.25rem; max-width: 600px; margin: 0 auto 2.5rem; color:var(--text-muted);">Automatically rank candidates, extract skills, and identify top performers using advanced AI matching logic. No more manual screening.</p>
                     <div style="display: flex; gap: 1rem; justify-content: center;">
-                        <a href="#upload-section" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">Start Shortlisting Now</a>
+                        <a onclick="App.loadPage('signup.html'); return false;" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem; cursor: pointer;">Start Shortlisting Now</a>
                         <a href="#how-it-works" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">See How It Works</a>
                     </div>
                 </div>
@@ -81,28 +81,12 @@
                 </div>
             </section>
 
-            <!-- Upload Application Section -->
-            <section id="upload-section" style="max-width:800px; margin:0 auto;">
-                <div class="candidate-card" style="padding: 3rem; text-align: center;">
-                    <h2>Ready to shortlist?</h2>
-                    <p style="color:var(--text-muted); margin-bottom: 2rem;">Upload your candidate resumes below to begin.</p>
-                    
-                    <div id="dropZone" style="border: 2px dashed #cbd5e1; border-radius: var(--radius-lg); padding: 4rem 2rem; background: #f8fafc; cursor: pointer; transition: all 0.2s ease;">
-                        <div style="font-size: 4rem; margin-bottom: 1rem;">📂</div>
-                        <h3>Drag & Drop Resumes</h3>
-                        <p style="color:var(--text-muted);">Supported format: PDF (Max 10MB)</p>
-                        <input type="file" id="fileInput" name="resumes" multiple accept=".pdf" style="display:none;">
-                    </div>
-
-                    <ul class="file-list" id="fileList" style="list-style: none; margin-top: 2rem; text-align: left;">
-                        <!-- File items will appear here -->
-                    </ul>
-
-                    <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
-                        <button id="nextBtn" class="btn btn-primary" disabled>
-                            Continue to Job Details <span style="margin-left:5px">→</span>
-                        </button>
-                    </div>
+            <!-- CTA Section -->
+            <section id="cta" style="padding: 4rem 0; text-align: center; background: linear-gradient(to right, #f8fafc, #edf2f7);">
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <h2 style="margin-bottom: 1rem;">Ready to find your next hire?</h2>
+                    <p style="color:var(--text-muted); margin-bottom: 2rem;">Join thousands of recruiters using ResumeAI to save time.</p>
+                    <a onclick="App.loadPage('signup.html'); return false;" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem; cursor: pointer;">Create Free Account</a>
                 </div>
             </section>
         </div>

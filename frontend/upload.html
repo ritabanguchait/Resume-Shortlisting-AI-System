@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload - ResumeAI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+     <div id="app">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-content">
+                <a href="#" onclick="App.loadPage('dashboard.html'); return false;" class="brand">
+                    <span style="font-size: 1.5rem;">⚡</span> ResumeAI
+                </a>
+                <button onclick="App.loadPage('dashboard.html')" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">← Back to Dashboard</button>
+            </div>
+        </nav>
+
+        <div class="container">
+             <!-- Upload Application Section -->
+             <div class="upload-card" style="max-width:800px; margin:0 auto; text-align:center;">
+                <h2>Upload Resumes</h2>
+                <p style="color:var(--text-muted); margin-bottom: 2rem;">Select candidate resumes to begin analysis.</p>
+                
+                <div id="dropZone" style="border: 2px dashed #cbd5e1; border-radius: var(--radius-lg); padding: 4rem 2rem; background: #ffff; cursor: pointer; transition: all 0.2s ease;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📂</div>
+                    <h3>Drag & Drop Resumes</h3>
+                    <p style="color:var(--text-secondary);">Supported format: PDF (Max 10MB)</p>
+                    <input type="file" id="fileInput" name="resumes" multiple accept=".pdf" style="display:none;">
+                </div>
+
+                <ul class="file-list" id="fileList" style="list-style: none; margin-top: 2rem; text-align: left;">
+                    <!-- File items will appear here -->
+                </ul>
+
+                <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                    <button id="nextBtn" class="btn btn-primary" disabled>
+                        Continue to Job Details <span style="margin-left:5px">→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+     </div>
+</body>
+</html>

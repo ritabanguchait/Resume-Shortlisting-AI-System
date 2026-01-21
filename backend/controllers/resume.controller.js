@@ -1,5 +1,6 @@
 const path = require('path');
 const mlService = require('../services/ml.service');
+const jobService = require('../services/job.service');
 
 const shortlistResumes = async (req, res) => {
     try {
@@ -17,8 +18,16 @@ const shortlistResumes = async (req, res) => {
 
         const results = await mlService.processResumes(jobDescription, filePaths);
 
+        // Persist job and candidates
+        const job = await jobService.createJob({
+            jobDescription,
+            uploadedBy: req.user.id, // From auth middleware
+            candidates: results
+        });
+
         res.json({
             success: true,
+            jobId: job.id,
             data: results
         });
 
