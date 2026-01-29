@@ -1,50 +1,62 @@
-<<<<<<< HEAD
 # Resume Shortlisting & Job Matching System
 
-## Project Overview
-A professional web application for HR and Interviewers to:
-- Upload multiple resumes (PDF).
-- Enter a job description.
-- Automatically shortlist candidates based on skill matching and relevance.
-- View detailed analysis including match percentage, skills, pros, and cons.
+A professional, role-based web application for Resume Shortlisting.
+- **Students**: Upload resume, get instant AI feedback (Score, Tips, Missing Skills).
+- **HR**: Create jobs, bulk upload resumes, and get a ranked shortlist of candidates.
 
-## Tech Stack
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript.
-- **Backend**: Node.js, Express.js.
-- **ML/NLP**: Python, Scikit-learn, Pandas, PDFPlumber.
+## 🚀 How to Run
 
-## Setup & Run Instructions
+### 1. Prerequisites
+- **Node.js** (v16+)
+- **Python** (v3.8+)
+- **Git**
 
-### Prerequisites
-- Node.js installed.
-- Python 3.x installed.
+### 2. Backend Setup
+1. Open a terminal in the root directory.
+2. Navigate to the backend folder:
+   ```bash
+   cd backend
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the server (runs on port 3000):
+   ```bash
+   npm start
+   ```
+   *You should see "Server running on port 3000"*
 
-### Installation
-1.  **Backend Setup**:
-    ```bash
-    cd backend
-    npm install
-    ```
-2.  **ML Setup**:
-    ```bash
-    pip install scikit-learn pdfplumber numpy pandas nltk flask
-    ```
-    *(Note: Flask/API is not strictly used if using child_process, but dependencies are required)*
+### 3. Machine Learning Setup
+1. Open a new terminal.
+2. Install Python dependencies:
+   ```bash
+   pip install sentence-transformers numpy pandas scikit-learn pdfplumber
+   ```
+   *(Note: The system will automatically download the 'all-MiniLM-L6-v2' model on first run)*
 
-### Running the Application
-1.  Start the backend server:
-    ```bash
-    cd backend
-    node server.js
-    ```
-2.  Open `http://localhost:3000` (or configured port) in your browser.
-    *(Frontend is served via the backend or can be opened directly if configured that way)*
+### 4. Running the Frontend
+Since this is a simple HTML/JS frontend, you need to serve it to avoid CORS issues.
+**Option A: Live Server (Recommended)**
+- If using VS Code, install "Live Server" extension.
+- Right-click `.frontend/index.html` -> "Open with Live Server".
 
-## ML Logic
-The system uses **TF-IDF (Term Frequency-Inverse Document Frequency)** and **Cosine Similarity** to compare the job description text with the extracted text from resumes.
-- **Skill Extraction**: Parses text for known technical skills.
-- **Match Percentage**: Cosine similarity score normalized to a percentage.
-=======
-# Resume-Shortlisting-AI-CSystem
-AI-powered Resume Shortlisting and Job Matching System that automates bulk resume screening using NLP and Machine Learning. Allows HR to upload multiple resumes, analyze skills, calculate match scores, and shortlist or reject candidates with clear pros, cons, and missing skills. Built with Node.js, Python, and a modern, card-based web interface.
->>>>>>> bfb731f39636edd05fa2a448d3af5a64b484d691
+**Option B: Simple Python Server**
+1. Navigate to the frontend folder:
+   ```bash
+   cd frontend
+   ```
+2. Run:
+   ```bash
+   python -m http.server 8000
+   ```
+3. Open `http://localhost:8000` in your browser.
+
+## 🔑 Login Credentials
+**Student Portal**
+- **Email:** student@example.com
+- **Password:** student123 (or Sign Up as new)
+
+**HR Portal**
+- **Email:** hr@example.com
+- **Password:** hr123 (or Sign Up as new)

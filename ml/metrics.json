@@ -1,0 +1,8 @@
+{
+    "model_name": "all-MiniLM-L6-v2",
+    "optimal_threshold": 0.6500000000000001,
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0
+}

@@ -3,50 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Details</title>
+    <title>Create Job Posting - ResumeAI</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/theme.js"></script>
     <script src="js/app.js" defer></script>
 </head>
 <body>
     <div id="app">
+        <!-- Navigation -->
         <nav class="navbar">
-             <div class="navbar-content">
-                <a href="#" onclick="window.location.reload(); return false;" class="brand">
-                    <span style="font-size: 1.5rem;">⚡</span> ResumeAI
+            <div class="navbar-content">
+                <a href="#" onclick="App.loadPage('dashboard-hr.html'); return false;" class="brand">
+                    <span>⚡</span> ResumeAI
                 </a>
+                <button onclick="App.loadPage('dashboard-hr.html')" class="btn btn-ghost btn-sm">
+                    <span>←</span> Back to Dashboard
+                </button>
+                <button id="themeToggle" class="btn btn-ghost btn-icon" title="Toggle theme" style="padding: 0.5rem; width: 40px; height: 40px;">
+                    <span class="theme-icon-light" style="font-size: 1.25rem;">🌙</span>
+                    <span class="theme-icon-dark" style="display: none; font-size: 1.25rem;">☀️</span>
+                </button>
             </div>
         </nav>
 
-        <div class="container">
-            <div style="max-width: 800px; margin: 0 auto;">
-                <div style="text-align:center; margin-bottom: 2rem;">
-                    <h2>Job Requirements</h2>
-                    <p style="color:var(--text-muted);">Define what you are looking for. The AI will match candidates against this description.</p>
+        <div class="container section" style="max-width: 900px;">
+            <!-- Header -->
+            <div class="text-center mb-8 fade-in">
+                <div class="badge badge-primary mb-4" style="font-size: 0.875rem;">
+                    Step 2 of 2
+                </div>
+                <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Define Job Requirements</h1>
+                <p class="text-lg text-secondary" style="max-width: 650px; margin: 0 auto;">
+                    Provide a detailed job description to help our AI match the most qualified candidates.
+                </p>
+            </div>
+
+            <!-- Main Card -->
+            <div class="card scale-in" style="padding: 2rem;">
+                <!-- Job Title -->
+                <div class="form-group">
+                    <label for="jobTitle" class="form-label">
+                        Job Title
+                        <span class="text-muted font-normal">(Optional)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="jobTitle" 
+                        class="form-input" 
+                        placeholder="e.g., Senior Product Manager, Full Stack Developer"
+                        style="font-size: 1.125rem; padding: 1rem;"
+                    >
+                    <p class="form-hint">This helps organize your job postings</p>
                 </div>
 
-                <div class="candidate-card" style="text-align: left; padding: 2rem;">
-                    <div class="form-group">
-                        <label for="jobDescription" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Job Description / Requirements</label>
-                        <textarea id="jobDescription" placeholder="Example: We are looking for a Senior Software Engineer with 5+ years of experience in Node.js and React..." required style="width:100%; min-height:300px; padding:1rem; border:1px solid var(--border); border-radius:var(--radius-md); font-family:monospace; resize:vertical;"></textarea>
-                    </div>
+                <!-- Job Description -->
+                <div class="form-group">
+                    <label for="jobDescription" class="form-label">
+                        Job Description / Requirements
+                        <span class="text-danger">*</span>
+                    </label>
+                    <textarea 
+                        id="jobDescription" 
+                        class="form-textarea" 
+                        placeholder="Paste the complete job description here...
 
-                    <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
-                        <button onclick="window.location.reload()" class="btn btn-secondary">← Back</button>
-                        <button id="processBtn" class="btn btn-primary">
-                            Analyze Candidates ⚡
+Include:
+• Required skills and qualifications
+• Years of experience needed
+• Key responsibilities
+• Technical requirements
+• Soft skills and competencies
+
+The more detailed your description, the better the AI matching accuracy."
+                        required
+                        style="min-height: 400px; font-size: 1rem; line-height: 1.6;"
+                    ></textarea>
+                    <p class="form-hint">
+                        <span class="font-semibold">💡 Tip:</span> A comprehensive job description improves match accuracy by up to 30%
+                    </p>
+                </div>
+
+                <!-- Template Suggestions (Placeholder) -->
+                <div class="card-compact mb-6" style="background: var(--info-light); border: 1px solid var(--info-bg); border-radius: var(--radius-md); padding: 1rem;">
+                    <div class="flex items-start gap-3">
+                        <span style="font-size: 1.25rem;">📝</span>
+                        <div class="flex-1">
+                            <h4 class="font-semibold mb-1" style="color: var(--info);">Need help writing a JD?</h4>
+                            <p class="text-sm text-secondary mb-2">
+                                Use our AI-powered templates to create professional job descriptions
+                            </p>
+                            <button class="btn btn-sm" style="background: var(--info); color: white;" disabled>
+                                Browse Templates (Coming Soon)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-between items-center pt-6" style="border-top: 1px solid var(--border);">
+                    <button onclick="App.loadPage('dashboard-hr.html')" class="btn btn-ghost">
+                        <span>←</span> Cancel
+                    </button>
+                    <div class="flex gap-3">
+                        <button class="btn btn-secondary" onclick="saveDraft()" disabled>
+                            Save Draft
+                        </button>
+                        <button id="processBtn" class="btn btn-primary btn-lg">
+                            Analyze Candidates
+                            <span>⚡</span>
                         </button>
                     </div>
                 </div>
             </div>
+
+            <!-- Info Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div class="flex items-start gap-3">
+                    <div style="width: 40px; height: 40px; background: var(--primary-light); color: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
+                        🎯
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-1">Semantic Matching</h4>
+                        <p class="text-sm text-muted">AI understands context, not just keywords</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div style="width: 40px; height: 40px; background: var(--success-light); color: var(--success); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
+                        📊
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-1">Instant Rankings</h4>
+                        <p class="text-sm text-muted">Get scored candidates in seconds</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div style="width: 40px; height: 40px; background: var(--warning-light); color: var(--warning); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
+                        ⚡
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-1">Bulk Processing</h4>
+                        <p class="text-sm text-muted">Analyze hundreds of resumes at once</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        
+
         <!-- Loading Overlay -->
-        <div class="loading-overlay" id="loading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); display:none; flex-direction:column; justify-content:center; align-items:center; z-index:1000;">
-            <div class="spinner" style="width:50px; height:50px; border:5px solid #f3f3f3; border-top:5px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite;"></div>
-            <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
-            <h2 style="margin-top: 1rem;">Analyzing Resumes...</h2>
-            <p style="color:var(--text-muted);">Extracting skills and calculating match scores using AI</p>
+        <div id="loading" class="modal-backdrop" style="display: none;">
+            <div class="card text-center" style="max-width: 400px; padding: 3rem;">
+                <div class="spinner mx-auto mb-6"></div>
+                <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Analyzing Candidates...</h2>
+                <p class="text-secondary mb-4">
+                    Our AI is processing resumes and calculating match scores
+                </p>
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+                </div>
+                <p class="text-sm text-muted mt-3">This usually takes 10-30 seconds</p>
+            </div>
         </div>
     </div>
+
+    <style>
+        #jobDescription:focus {
+            min-height: 500px;
+            transition: min-height 0.3s ease;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            App.initJob();
+            
+            // Character counter (optional enhancement)
+            const textarea = document.getElementById('jobDescription');
+            const processBtn = document.getElementById('processBtn');
+            
+            textarea.addEventListener('input', () => {
+                const length = textarea.value.trim().length;
+                processBtn.disabled = length < 50;
+                
+                if (length < 50) {
+                    processBtn.style.opacity = '0.5';
+                    processBtn.title = 'Please provide a more detailed job description';
+                } else {
+                    processBtn.style.opacity = '1';
+                    processBtn.title = '';
+                }
+            });
+            
+            // Simulate progress bar during loading
+            window.showLoadingProgress = () => {
+                const loading = document.getElementById('loading');
+                const progressBar = document.getElementById('progressBar');
+                loading.style.display = 'flex';
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress > 90) progress = 90;
+                    progressBar.style.width = progress + '%';
+                }, 500);
+                
+                // Clear interval when done (will be handled by App.initJob)
+                window.clearProgressInterval = () => clearInterval(interval);
+            };
+        });
+        
+        function saveDraft() {
+            alert('Draft saving feature coming soon!');
+        }
+    </script>
 </body>
 </html>

@@ -1,9 +1,9 @@
 import re
 
-# A comprehensive list of technical skills for extraction
+# Canonical Skill List
 SKILL_DB = [
     'python', 'java', 'c++', 'c#', 'javascript', 'typescript', 'html', 'css', 
-    'react', 'angular', 'vue', 'node.js', 'nodejs', 'express', 'django', 'flask', 
+    'react', 'angular', 'vue', 'node.js', 'express', 'django', 'flask', 
     'spring', 'sql', 'mysql', 'postgresql', 'mongodb', 'aws', 'azure', 'gcp', 
     'docker', 'kubernetes', 'git', 'linux', 'machine learning', 'deep learning',
     'tensorflow', 'pytorch', 'scikit-learn', 'pandas', 'numpy', 'nlp', 'computer vision',
@@ -11,24 +11,59 @@ SKILL_DB = [
     'tableau', 'power bi', 'excel', 'spark', 'hadoop'
 ]
 
+# Aliases for normalization (variation -> canonical)
+SKILL_ALIASES = {
+    'reactjs': 'react', 'react.js': 'react',
+    'nodejs': 'node.js', 'node js': 'node.js',
+    'musql': 'mysql', # common typo
+    'postgres': 'postgresql',
+    'js': 'javascript',
+    'ts': 'typescript',
+    'golang': 'go',
+    'ml': 'machine learning',
+    'dl': 'deep learning',
+    'cv': 'computer vision',
+    'aws web services': 'aws',
+    'google cloud': 'gcp',
+    'google cloud platform': 'gcp',
+    'cplusplus': 'c++',
+    'csharp': 'c#',
+    'html5': 'html',
+    'css3': 'css'
+}
+
 def extract_skills(text):
+    text = text.lower()
     found_skills = set()
-    # Simple keyword matching for now (efficient and effective for this scope)
-    # Could be enhanced with NLTK/Spacy named entity recognition
+    
+    # Check Canonical Skills
     for skill in SKILL_DB:
-        # Use word boundary check to avoid partial matches (e.g., "java" in "javascript")
-        # specific handling for c++ and c#
+        # Handle special chars
         escaped_skill = re.escape(skill)
-        pattern = r'\b' + escaped_skill + r'\b'
-        
-        # Handle special cases like c++ or node.js where word boundaries might fail with regex defaults
-        if skill in ['c++', 'c#', 'node.js', 'nodejs']:
-             if skill in text:
-                 found_skills.add(skill)
+        # Boundary check: \b matches transition from word to non-word char (like space, punctuation)
+        # For "C++", + is not a word char, so \bC\+\+\b might fail depending on context if followed by space vs dot
+        # We'll use a slightly more robust regex for these specific cases
+        if skill in ['c++', 'c#', '.net']:
+            pattern = re.compile(re.escape(skill)) # simpler check for these
+             # Check if it exists with whitespace around or start/end of string
+            # This is a bit loose but C++ is rare to mis-match (unlike 'C')
+            if pattern.search(text):
+                found_skills.add(skill)
         else:
+            pattern = r'\b' + escaped_skill + r'\b'
             if re.search(pattern, text):
                 found_skills.add(skill)
-    
+
+    # Check Aliases
+    for alias, canonical in SKILL_ALIASES.items():
+        if canonical in found_skills:
+            continue # already found
+            
+        escaped_alias = re.escape(alias)
+        pattern = r'\b' + escaped_alias + r'\b'
+        if re.search(pattern, text):
+            found_skills.add(canonical)
+            
     return list(found_skills)
 
 def identify_missing_skills(job_desc_text, candidate_skills):

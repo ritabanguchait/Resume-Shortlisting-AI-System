@@ -6,8 +6,12 @@ const cookieParser = require('cookie-parser');
 const resumeRoutes = require('./routes/resume.routes');
 const authRoutes = require('./routes/auth.routes');
 const jobRoutes = require('./routes/job.routes');
+const firebaseConfig = require('./config/firebase.config');
 
 const app = express();
+
+// Initialize Firebase Admin
+firebaseConfig.initializeFirebase();
 
 // Middleware - CORS must come before routes
 app.use(cors({

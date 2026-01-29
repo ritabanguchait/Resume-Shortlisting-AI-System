@@ -3,106 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ResumeAI - Smart Hiring Platform</title>
+    <title>ResumeAI - Intelligent Recruitment Platform</title>
+    <meta name="description" content="AI-powered resume screening and career advancement platform. Get instant ATS scores and connect with top employers.">
     <link rel="stylesheet" href="css/style.css">
-    <!-- Using system fonts, but simulated nice look via CSS -->
+    <script src="js/theme.js"></script>
+    <script src="js/app.js" defer></script>
 </head>
 <body>
-    
     <div id="app">
         <!-- Navigation -->
         <nav class="navbar">
             <div class="navbar-content">
-                <a href="#" class="brand">
-                    <span style="font-size: 1.5rem;">⚡</span> ResumeAI
+                <a href="index.html" class="brand">
+                    <span>⚡</span> ResumeAI
                 </a>
-                <div>
-                    <a href="#features" class="btn btn-secondary" style="border:none; box-shadow:none;">Features</a>
-                    <a onclick="App.loadPage('signup.html'); return false;" class="btn btn-primary" style="cursor: pointer;">Get Started</a>
+                <div class="flex gap-4 items-center">
+                    <button id="themeToggle" class="btn btn-ghost btn-icon" title="Toggle theme" style="padding: 0.5rem; width: 40px; height: 40px;">
+                        <span class="theme-icon-light" style="font-size: 1.25rem;">🌙</span>
+                        <span class="theme-icon-dark" style="display: none; font-size: 1.25rem;">☀️</span>
+                    </button>
+                    <button onclick="App.loadPage('student-login.html')" class="btn btn-ghost mobile-hidden">Sign In</button>
+                    <button onclick="App.loadPage('hr-signup.html')" class="btn btn-primary">For Recruiters</button>
                 </div>
             </div>
         </nav>
 
-        <!-- App Container -->
-        <div class="container"> 
-            <!-- Hero Section -->
-            <section class="hero">
-                <div style="text-align:center; padding: 4rem 0;">
-                    <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Hire the Best Talent,<br>In Seconds.</h1>
-                    <p style="font-size: 1.25rem; max-width: 600px; margin: 0 auto 2.5rem; color:var(--text-muted);">Automatically rank candidates, extract skills, and identify top performers using advanced AI matching logic. No more manual screening.</p>
-                    <div style="display: flex; gap: 1rem; justify-content: center;">
-                        <a onclick="App.loadPage('signup.html'); return false;" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem; cursor: pointer;">Start Shortlisting Now</a>
-                        <a href="#how-it-works" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">See How It Works</a>
+        <!-- Hero Section -->
+        <header class="section" style="padding: 6rem 0 4rem; background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); position: relative; overflow: hidden;">
+            <!-- Background Decoration -->
+            <div style="position: absolute; top: -10%; right: -5%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+            <div style="position: absolute; bottom: -10%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+            
+            <div class="container text-center" style="position: relative; z-index: 1;">
+                <div class="fade-in">
+                    <div class="badge badge-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem; margin-bottom: 1.5rem;">
+                        🚀 AI-Powered Resume Intelligence
+                    </div>
+                    <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); max-width: 900px; margin: 0 auto 1.5rem; line-height: 1.1; background: linear-gradient(135deg, #0f172a 0%, #4f46e5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        Land Your Dream Job.<br>
+                        Hire Top Talent. <span style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Instantly.</span>
+                    </h1>
+                    <p style="font-size: 1.25rem; max-width: 650px; margin: 0 auto 2.5rem; color: var(--text-secondary); line-height: 1.6;">
+                        The intelligent platform that connects ambitious professionals with forward-thinking companies using advanced AI matching.
+                    </p>
+                    <div class="flex justify-center gap-4 flex-wrap">
+                        <button onclick="App.loadPage('student-signup.html')" class="btn btn-primary btn-lg" style="box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);">
+                            <span>📄</span> Assess My Resume
+                        </button>
+                        <button onclick="App.loadPage('hr-login.html')" class="btn btn-secondary btn-lg">
+                            <span>🎯</span> Find Candidates
+                        </button>
+                    </div>
+                    
+                    <!-- Social Proof -->
+                    <div class="flex justify-center gap-8 mt-8 text-sm text-muted flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <span style="color: var(--success); font-size: 1.25rem;">✓</span>
+                            <span>10,000+ Resumes Analyzed</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span style="color: var(--success); font-size: 1.25rem;">✓</span>
+                            <span>500+ Companies Trust Us</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span style="color: var(--success); font-size: 1.25rem;">✓</span>
+                            <span>95% Match Accuracy</span>
+                        </div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </header>
 
-            <!-- Features Section -->
-            <section id="features" class="results-grid" style="padding-top: 2rem;">
-                <div class="candidate-card" style="padding:2rem; text-align:center; align-items:center;">
-                    <div style="font-size:3rem; margin-bottom:1rem;">🔍</div>
-                    <h3>Smart Analysis</h3>
-                    <p style="color:var(--text-muted);">Our ML algorithms analyze resumes deeply to understand context, not just keyword matching.</p>
+        <!-- Features Section -->
+        <section class="section" style="background: white;">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Why Choose ResumeAI?</h2>
+                    <p class="text-lg text-secondary" style="max-width: 600px; margin: 0 auto;">
+                        Cutting-edge technology meets human insight for better hiring outcomes.
+                    </p>
                 </div>
-                <div class="candidate-card" style="padding:2rem; text-align:center; align-items:center;">
-                    <div style="font-size:3rem; margin-bottom:1rem;">⚡</div>
-                    <h3>Instant Ranking</h3>
-                    <p style="color:var(--text-muted);">Process hundreds of resumes in seconds and get a sorted list of the best matches.</p>
-                </div>
-                <div class="candidate-card" style="padding:2rem; text-align:center; align-items:center;">
-                    <div style="font-size:3rem; margin-bottom:1rem;">📊</div>
-                    <h3>Detailed Insights</h3>
-                    <p style="color:var(--text-muted);">Get automatic extraction of skills, pros, cons, and missing requirements for every candidate.</p>
-                </div>
-            </section>
-
-            <!-- Workflow Section -->
-            <section id="how-it-works" style="padding: 4rem 0; text-align: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 4rem 0;">
-                <div style="margin-bottom: 3rem;">
-                    <h2>How It Works</h2>
-                    <p style="color:var(--text-muted);">Three simple steps to your next hire</p>
-                </div>
-                <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
-                    <div style="flex:1; min-width:250px;">
-                        <div style="width: 3rem; height: 3rem; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 0 auto 1rem;">1</div>
-                        <h4>Upload Resumes</h4>
-                        <p style="color:var(--text-muted);">Drag and drop multiple PDF resumes into the system.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="card card-hover" style="text-align: center;">
+                        <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">
+                            🎯
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Semantic Matching</h3>
+                        <p class="text-secondary">
+                            Our ML engine understands context, not just keywords, ensuring the perfect candidate-role fit.
+                        </p>
                     </div>
-                    <div style="flex:1; min-width:250px;">
-                        <div style="width: 3rem; height: 3rem; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 0 auto 1rem;">2</div>
-                        <h4>Define Job</h4>
-                        <p style="color:var(--text-muted);">Paste your job description to set the matching criteria.</p>
+                    
+                    <!-- Feature 2 -->
+                    <div class="card card-hover" style="text-align: center;">
+                        <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">
+                            📊
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Real-Time Insights</h3>
+                        <p class="text-secondary">
+                            Instant ATS scores, missing skills analysis, and actionable improvement recommendations.
+                        </p>
                     </div>
-                    <div style="flex:1; min-width:250px;">
-                        <div style="width: 3rem; height: 3rem; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 0 auto 1rem;">3</div>
-                        <h4>Get Results</h4>
-                        <p style="color:var(--text-muted);">View ranked candidates with detailed AI insights.</p>
+                    
+                    <!-- Feature 3 -->
+                    <div class="card card-hover" style="text-align: center;">
+                        <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem;">
+                            ⚡
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Lightning Fast</h3>
+                        <p class="text-secondary">
+                            Process hundreds of resumes in seconds. Rank, filter, and shortlist with unprecedented speed.
+                        </p>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- CTA Section -->
-            <section id="cta" style="padding: 4rem 0; text-align: center; background: linear-gradient(to right, #f8fafc, #edf2f7);">
-                <div style="max-width: 600px; margin: 0 auto;">
-                    <h2 style="margin-bottom: 1rem;">Ready to find your next hire?</h2>
-                    <p style="color:var(--text-muted); margin-bottom: 2rem;">Join thousands of recruiters using ResumeAI to save time.</p>
-                    <a onclick="App.loadPage('signup.html'); return false;" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem; cursor: pointer;">Create Free Account</a>
+        <!-- How It Works -->
+        <section class="section" style="background: var(--gray-50);">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">How It Works</h2>
+                    <p class="text-lg text-secondary">Simple, fast, and effective</p>
                 </div>
-            </section>
-        </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center text-center">
+                        <div style="width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin-bottom: 1.5rem; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);">
+                            1
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Upload Resume</h3>
+                        <p class="text-secondary">
+                            Students upload their resume. Recruiters post job descriptions and upload candidate resumes.
+                        </p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center text-center">
+                        <div style="width: 80px; height: 80px; background: var(--success); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin-bottom: 1.5rem; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);">
+                            2
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">AI Analysis</h3>
+                        <p class="text-secondary">
+                            Our advanced ML engine analyzes skills, experience, and semantic context in real-time.
+                        </p>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center text-center">
+                        <div style="width: 80px; height: 80px; background: var(--warning); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin-bottom: 1.5rem; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);">
+                            3
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Get Results</h3>
+                        <p class="text-secondary">
+                            Receive detailed scores, rankings, and insights to make informed decisions instantly.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <footer style="text-align: center; padding: 2rem; color: #94a3b8; margin-top: 2rem; border-top: 1px solid #e2e8f0;">
-            <p>&copy; 2026 ResumeAI System. Professional Hiring Tool.</p>
+        <!-- CTA Section -->
+        <section class="section" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white;">
+            <div class="container text-center">
+                <h2 style="font-size: 2.5rem; color: white; margin-bottom: 1rem;">Ready to Transform Your Career?</h2>
+                <p style="font-size: 1.25rem; opacity: 0.9; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    Join thousands of professionals and companies using ResumeAI to achieve their goals.
+                </p>
+                <div class="flex justify-center gap-4 flex-wrap">
+                    <button onclick="App.loadPage('student-signup.html')" class="btn btn-lg" style="background: white; color: var(--primary); font-weight: 700;">
+                        Get Started Free
+                    </button>
+                    <button onclick="App.loadPage('hr-signup.html')" class="btn btn-lg" style="background: transparent; color: white; border: 2px solid white;">
+                        For Enterprises
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer style="background: linear-gradient(180deg, var(--gray-900) 0%, #000000 100%); color: var(--gray-400); padding: 5rem 0 2rem; position: relative; overflow: hidden;">
+            <!-- Decorative Background Elements -->
+            <div style="position: absolute; top: -50%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+            <div style="position: absolute; bottom: -30%; left: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+            
+            <div class="container" style="position: relative; z-index: 1;">
+                <!-- Top Section: Brand & Description -->
+                <div class="text-center mb-12">
+                    <div class="footer-brand" style="color: white; font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1.25rem;">
+                        <span style="font-size: 3rem; display: inline-block; animation: pulse 2s ease-in-out infinite;">⚡</span> 
+                        <span style="background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">ResumeAI</span>
+                    </div>
+                    <p style="color: var(--gray-500); font-size: 1.125rem; max-width: 700px; margin: 0 auto; line-height: 1.8;">
+                        Intelligent recruitment powered by advanced AI technology
+                    </p>
+                </div>
+                
+                <!-- Middle Section: Link Columns -->
+                <div class="footer-links-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4rem; max-width: 1000px; margin: 0 auto 4rem; padding: 3rem 0;">
+                    <!-- Product Column -->
+                    <div class="footer-column" style="text-align: center;">
+                        <h4 class="footer-heading" style="margin-bottom: 1.5rem;">PRODUCT</h4>
+                        <ul class="footer-list">
+                            <li><a href="#" class="footer-link-enhanced">Features</a></li>
+                            <li><a href="#" class="footer-link-enhanced">Pricing</a></li>
+                            <li><a href="#" class="footer-link-enhanced">Enterprise</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Company Column -->
+                    <div class="footer-column" style="text-align: center;">
+                        <h4 class="footer-heading" style="margin-bottom: 1.5rem;">COMPANY</h4>
+                        <ul class="footer-list">
+                            <li><a href="#" class="footer-link-enhanced">About Us</a></li>
+                            <li><a href="#" class="footer-link-enhanced">Careers</a></li>
+                            <li><a href="#" class="footer-link-enhanced">Contact</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Legal Column -->
+                    <div class="footer-column" style="text-align: center;">
+                        <h4 class="footer-heading" style="margin-bottom: 1.5rem;">LEGAL</h4>
+                        <ul class="footer-list">
+                            <li><a href="#" class="footer-link-enhanced">Privacy Policy</a></li>
+                            <li><a href="#" class="footer-link-enhanced">Terms of Service</a></li>
+                            <li><a href="#" class="footer-link-enhanced">Cookie Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Bottom Section: Social & Copyright -->
+                <div class="text-center pt-8" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div class="flex justify-center items-center gap-6 mb-5 flex-wrap">
+                        <a href="#" class="social-link" title="Twitter">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+                        </a>
+                        <a href="#" class="social-link" title="LinkedIn">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                        <a href="#" class="social-link" title="GitHub">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                        </a>
+                    </div>
+                    <p style="color: var(--gray-600); font-size: 0.875rem;">
+                        © 2026 ResumeAI Inc. All rights reserved.
+                    </p>
+                </div>
+            </div>
         </footer>
     </div>
-    </div>
 
-    <script src="js/app.js"></script>
-    <script>
-        // Initialize Upload Page logic
-        document.addEventListener('DOMContentLoaded', () => {
-             App.initUpload();
-        });
-    </script>
+    <style>
+        /* Footer Styles */
+        .footer-heading {
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, var(--primary) 50%, transparent 100%);
+        }
+        
+        .footer-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .footer-link-enhanced {
+            color: var(--gray-500);
+            font-size: 0.9375rem;
+            text-decoration: none;
+            transition: all var(--transition-fast);
+            display: inline-block;
+            position: relative;
+        }
+        
+        .footer-link-enhanced::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--primary);
+            transition: width var(--transition-fast);
+        }
+        
+        .footer-link-enhanced:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .footer-link-enhanced:hover::before {
+            width: 100%;
+        }
+        
+        .social-link {
+            color: var(--gray-600);
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .social-link:hover {
+            color: var(--primary);
+            background: rgba(129, 140, 248, 0.1);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        /* Responsive Footer */
+        @media (max-width: 768px) {
+            .footer-links-grid {
+                grid-template-columns: 1fr !important;
+                gap: 3rem !important;
+                padding: 2rem 0 !important;
+            }
+            
+            footer {
+                padding: 3rem 0 2rem !important;
+            }
+            
+            .brand {
+                font-size: 2rem !important;
+            }
+            
+            .brand span:first-child {
+                font-size: 2.5rem !important;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .footer-links-grid {
+                gap: 3rem !important;
+            }
+        }
+    </style>
 </body>
 </html>

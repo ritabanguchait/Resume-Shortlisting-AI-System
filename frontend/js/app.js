@@ -1,3 +1,97 @@
+// --- FIREBASE AUTH SERVICE ---
+window.FirebaseAuth = window.FirebaseAuth || {};
+
+(function() {
+    console.log('App-inlined Auth Service running');
+    
+    const firebaseConfig = {
+        apiKey: "YOUR_FIREBASE_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    let auth = null;
+
+            const initializeFirebase = () => {
+                console.log('Initializing Firebase...');
+                try {
+                    // Check explicitly for window.firebase
+                    if (window.firebase) {
+                        if (!window.firebase.apps.length) {
+                            window.firebase.initializeApp(firebaseConfig);
+                        }
+                        // Use window.firebase.auth()
+                        auth = window.firebase.auth();
+                        console.log('Firebase initialized successfully');
+                        return true;
+                    } else {
+                        console.warn('Firebase SDK not loaded (window.firebase is undefined)');
+                        console.log('Available window keys:', Object.keys(window).filter(k => k.startsWith('fire')));
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Firebase initialization error:', error);
+                    return false;
+                }
+            };
+
+            const signInWithGoogle = async () => {
+                try {
+                    if (!auth) {
+                         const initialized = initializeFirebase();
+                         if (!initialized) throw new Error('Firebase SDK failed to load. Check console.');
+                    }
+                    const provider = new window.firebase.auth.GoogleAuthProvider();
+                    provider.addScope('email');
+                    provider.addScope('profile');
+                    const result = await auth.signInWithPopup(provider);
+                    const user = result.user;
+                    const idToken = await user.getIdToken();
+                    return { idToken, email: user.email, name: user.displayName, photoURL: user.photoURL, provider: 'google' };
+                } catch (error) { console.error('Google sign-in error:', error); throw error; }
+            };
+
+            const signInWithGitHub = async () => {
+                try {
+                    if (!auth) {
+                         const initialized = initializeFirebase();
+                         if (!initialized) throw new Error('Firebase SDK failed to load. Check console.');
+                    }
+                    const provider = new window.firebase.auth.GithubAuthProvider();
+                    provider.addScope('user:email');
+                    const result = await auth.signInWithPopup(provider);
+                    const user = result.user;
+                    const idToken = await user.getIdToken();
+                    return { idToken, email: user.email, name: user.displayName || user.email.split('@')[0], photoURL: user.photoURL, provider: 'github' };
+                } catch (error) { console.error('GitHub sign-in error:', error); throw error; }
+            };
+
+    const authenticateWithBackend = async (oauthData) => {
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/oauth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(oauthData)
+            });
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Authentication failed');
+            }
+            return await response.json();
+        } catch (error) { console.error('Backend authentication error:', error); throw error; }
+    };
+
+    const signOut = async () => { try { if (auth) await auth.signOut(); } catch (error) { console.error('Sign out error:', error); } };
+
+    window.FirebaseAuth = { initialize: initializeFirebase, signInWithGoogle, signInWithGitHub, authenticateWithBackend, signOut };
+    console.log('App-inlined Firebase Auth module loaded.');
+})();
+// --- END AUTH SERVICE ---
+
 const App = (function() {
     // Store state in sessionStorage or module scope
     const STATE_KEY_RESULTS = 'analysisResults';
@@ -10,20 +104,26 @@ const App = (function() {
     const loadPage = async (pageName) => {
         try {
             // Check auth for protected pages
-            const publicPages = ['index.html', 'login.html', 'signup.html'];
+            const publicPages = ['index.html', 'student-login.html', 'student-signup.html', 'hr-login.html', 'hr-signup.html'];
+            
+            // Redirect root to student login if no session
+            if (pageName === 'login.html') pageName = 'student-login.html';
+            if (pageName === 'signup.html') pageName = 'student-signup.html';
+
             if (!publicPages.includes(pageName) && !currentUser) {
                 // Try to restore session first
                 const restored = await checkSession();
                 if (!restored) {
                     console.log('Access denied to', pageName);
-                    loadPage('login.html');
+                    loadPage('student-login.html');
                     return;
                 }
             }
 
             // Redirect logged in users away from auth pages
-            if ((pageName === 'login.html' || pageName === 'signup.html') && currentUser) {
-                loadPage('dashboard.html');
+            if (publicPages.includes(pageName) && currentUser && pageName !== 'index.html') {
+                if (currentUser.role === 'hr') loadPage('dashboard-hr.html');
+                else loadPage('dashboard-student.html');
                 return;
             }
 
@@ -39,13 +139,24 @@ const App = (function() {
             
             document.getElementById('app').innerHTML = newContent;
             
+            // Execute scripts in the new content
+            const scripts = document.getElementById('app').querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+            
             // Re-initialize logic based on page
             if (pageName === 'job.html') initJob();
             if (pageName === 'result.html') initResults();
+            if (pageName === 'result-student.html') initStudentResult();
             if (pageName === 'upload.html') initUpload();
-            if (pageName === 'dashboard.html') initDashboard();
-            if (pageName === 'login.html') initAuth('login');
-            if (pageName === 'signup.html') initAuth('signup');
+            if (pageName === 'dashboard-hr.html' || pageName === 'dashboard.html') initHRDashboard();
+            if (pageName === 'dashboard-student.html') initStudentDashboard();
+            if (pageName.includes('login.html')) initAuth('login');
+            if (pageName.includes('signup.html')) initAuth('signup');
             if (pageName === 'index.html') initLanding();
             
         } catch (err) {
@@ -56,7 +167,7 @@ const App = (function() {
     // === Auth Logic ===
     const checkSession = async () => {
         try {
-            const res = await fetch('http://localhost:3000/api/auth/me', {
+            const res = await fetch('http://localhost:5000/api/auth/me', {
                 credentials: 'include'
             });
             if (res.ok) {
@@ -69,23 +180,49 @@ const App = (function() {
     };
 
     const initAuth = (type) => {
-        const form = document.getElementById(type === 'login' ? 'loginForm' : 'signupForm');
+        const form = document.getElementById('loginForm') || document.getElementById('signupForm');
         const errorDiv = document.getElementById('authError');
+
+        // Initialize Firebase
+        if (typeof window.FirebaseAuth !== 'undefined') {
+            window.FirebaseAuth.initialize();
+        }
+
+        // OAuth Button Handlers
+        const googleBtn = document.getElementById('googleSignInBtn');
+        const githubBtn = document.getElementById('githubSignInBtn');
+
+        if (googleBtn) {
+            googleBtn.addEventListener('click', async () => {
+                await handleOAuthSignIn('google', errorDiv);
+            });
+        }
+
+        if (githubBtn) {
+            githubBtn.addEventListener('click', async () => {
+                await handleOAuthSignIn('github', errorDiv);
+            });
+        }
 
         if (form) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 errorDiv.style.display = 'none';
                 errorDiv.textContent = '';
+                
+                const role = form.dataset.role; // 'student' or 'hr'
 
                 const formData = {};
-                if (type === 'signup') formData.name = document.getElementById('name').value;
+                if (type === 'signup') {
+                    formData.name = document.getElementById('name').value;
+                    formData.role = role;
+                }
                 formData.email = document.getElementById('email').value;
                 formData.password = document.getElementById('password').value;
 
                 try {
                     const endpoint = type === 'login' ? '/api/auth/login' : '/api/auth/signup';
-                    const res = await fetch(`http://localhost:3000${endpoint}`, {
+                    const res = await fetch(`http://localhost:5000${endpoint}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(formData),
@@ -97,7 +234,9 @@ const App = (function() {
                     if (!res.ok) throw new Error(data.error || 'Auth failed');
 
                     currentUser = data.user;
-                    loadPage('dashboard.html');
+                    
+                    if (currentUser.role === 'hr') loadPage('dashboard-hr.html');
+                    else loadPage('dashboard-student.html');
 
                 } catch (err) {
                     errorDiv.textContent = err.message;
@@ -107,7 +246,93 @@ const App = (function() {
         }
     };
 
-    const initDashboard = () => {
+    // Handle OAuth Sign In
+    const handleOAuthSignIn = async (provider, errorDiv) => {
+        const btn = document.getElementById(provider === 'google' ? 'googleSignInBtn' : 'githubSignInBtn');
+        let originalText = '';
+        
+        try {
+            // Log verification
+            console.log('Checking FirebaseAuth...', window.FirebaseAuth);
+
+            // Check if Firebase is available
+            if (!window.FirebaseAuth || typeof window.FirebaseAuth.initialize !== 'function') {
+                console.error('FirebaseAuth not found on window object');
+                throw new Error('Firebase authentication module not initialized. Check console for errors.');
+            }
+
+            // Ensure initialized
+            window.FirebaseAuth.initialize();
+
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+                errorDiv.textContent = '';
+            }
+
+            // Show loading state
+            if (btn) {
+                originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span>Signing in...</span>';
+            }
+
+            // Perform OAuth sign in
+            let oauthData;
+            if (provider === 'google') {
+                oauthData = await window.FirebaseAuth.signInWithGoogle();
+            } else if (provider === 'github') {
+                oauthData = await window.FirebaseAuth.signInWithGitHub();
+            }
+
+            // Authenticate with backend
+            const response = await window.FirebaseAuth.authenticateWithBackend(oauthData);
+
+            if (response.success) {
+                currentUser = response.user;
+                
+                // Redirect to appropriate dashboard
+                if (currentUser.role === 'hr') {
+                    loadPage('dashboard-hr.html');
+                } else {
+                    loadPage('dashboard-student.html');
+                }
+            } else {
+                throw new Error('Backend authentication failed');
+            }
+
+        } catch (error) {
+            console.error('OAuth sign in error:', error);
+            
+            // Show user-friendly error message
+            let errorMessage = 'Authentication failed. Please try again.';
+            
+            if (error.code === 'auth/popup-blocked') {
+                errorMessage = 'Popup was blocked. Please allow popups for this site.';
+            } else if (error.code === 'auth/popup-closed-by-user') {
+                errorMessage = 'Sign-in cancelled.';
+            } else if (error.code === 'auth/cancelled-popup-request') {
+                errorMessage = 'Sign-in cancelled.';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            if (errorDiv) {
+                errorDiv.textContent = errorMessage;
+                errorDiv.style.display = 'block';
+            } else {
+                // Fallback: show alert if error div doesn't exist
+                alert(errorMessage);
+            }
+
+            // Restore button state
+            if (btn && originalText) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+    };
+
+    const initHRDashboard = async () => {
         const nameSpan = document.getElementById('userName');
         const logoutBtn = document.getElementById('logoutBtn');
         
@@ -116,14 +341,117 @@ const App = (function() {
         }
 
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', async () => {
-                await fetch('http://localhost:3000/api/auth/logout', { 
-                    method: 'POST',
-                    credentials: 'include'
-                });
-                currentUser = null;
-                loadPage('login.html');
+            logoutBtn.addEventListener('click', handleLogout);
+        }
+
+
+        // Fetch Dashboard Data
+        const statsTotal = document.getElementById('statTotalCandidates');
+        const statsShortlisted = document.getElementById('statShortlisted');
+        const statsActive = document.getElementById('statActiveJobs');
+        const tableBody = document.getElementById('recentJobsList');
+
+        try {
+            const res = await fetch('http://localhost:5000/api/jobs', { credentials: 'include' });
+            if (!res.ok) throw new Error('Failed to load jobs');
+            
+            const data = await res.json();
+            const jobs = data.data || [];
+
+            // Calculate Stats
+            let totalCandidates = 0;
+            let totalShortlisted = 0;
+
+            jobs.forEach(job => {
+                const cands = job.candidates || [];
+                totalCandidates += cands.length;
+                totalShortlisted += cands.filter(c => c.status === 'Shortlisted').length;
             });
+
+            if (statsTotal) statsTotal.textContent = totalCandidates;
+            if (statsShortlisted) statsShortlisted.textContent = totalShortlisted;
+            if (statsActive) statsActive.textContent = jobs.length;
+
+            // Render Table
+            if (tableBody) {
+                if (jobs.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;">No analyses found. Start one!</td></tr>';
+                    return;
+                }
+
+                // Sort by new
+                jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                tableBody.innerHTML = jobs.map(job => {
+                    const date = new Date(job.createdAt).toLocaleDateString();
+                    const snippet = job.jobDescription.substring(0, 50) + '...';
+                    const count = (job.candidates || []).length;
+                    const shortlistedCount = (job.candidates || []).filter(c => c.status === 'Shortlisted').length;
+                    
+                    return `
+                        <tr>
+                            <td>${date}</td>
+                            <td><div title="${job.jobDescription.replace(/"/g, '&quot;')}">${snippet}</div></td>
+                            <td>
+                                <span class="badge badge-neutral">${count} Total</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-success">${shortlistedCount} Shortlisted</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-secondary btn-sm" onclick="App.viewJobResults('${job.id}')">View Results</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+        } catch (error) {
+            console.error('Dashboard Load Error:', error);
+        }
+    };
+
+    const initStudentDashboard = () => {
+         const nameSpan = document.getElementById('studentName');
+         const logoutBtn = document.getElementById('logoutBtn');
+         
+         if (currentUser && nameSpan) {
+             nameSpan.textContent = currentUser.name;
+         }
+         if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+        }
+    };
+
+    const handleLogout = async () => {
+        await fetch('http://localhost:5000/api/auth/logout', { 
+            method: 'POST',
+            credentials: 'include'
+        });
+        currentUser = null;
+        loadPage('student-login.html');
+    };
+    
+    // New Helper to view past results
+    const viewJobResults = async (jobId) => {
+        try {
+            const res = await fetch(`http://3000/api/jobs/${jobId}`, { credentials: 'include' });
+            if (res.ok) {
+                const result = await res.json();
+                
+                sessionStorage.setItem(STATE_KEY_RESULTS, JSON.stringify(result.data));
+                uploadedFiles = []; // Clear
+                
+                // Redirect based on Role
+                if (currentUser && currentUser.role === 'student') {
+                    loadPage('result-student.html');
+                } else {
+                    loadPage('result.html');
+                }
+
+            }
+        } catch (err) {
+            alert('Failed to load job details');
         }
     };
 
@@ -172,12 +500,26 @@ const App = (function() {
             dropZone.addEventListener('drop', (e) => {
                 e.preventDefault();
                 dropZone.classList.remove('active');
+                dropZone.classList.remove('active');
+                
+                // Role-based limit check
+                if (currentUser && currentUser.role === 'student' && e.dataTransfer.files.length > 1) {
+                    alert('Students can only upload 1 resume. Please select a single file.');
+                    return;
+                }
+                
                 handleFiles(e.dataTransfer.files);
             });
         }
 
         if (fileInput) {
             fileInput.addEventListener('change', (e) => {
+                 // Role-based limit check
+                if (currentUser && currentUser.role === 'student' && e.target.files.length > 1) {
+                    alert('Students can only upload 1 resume. Please select a single file.');
+                    fileInput.value = ''; // Clear input
+                    return;
+                }
                 handleFiles(e.target.files);
             });
         }
@@ -191,17 +533,27 @@ const App = (function() {
             };
         }
 
-        function handleFiles(newFiles) {
-            Array.from(newFiles).forEach(file => {
-                if (file.type === 'application/pdf') {
-                    uploadedFiles.push(file);
-                } else {
-                    alert(`Skipped ${file.name}: Only PDF allowed.`);
-                }
-            });
-            renderFileList();
-            updateNextButton();
+        const handleFiles = (files) => {
+        // Enforce limit again just in case
+        if (currentUser && currentUser.role === 'student') {
+             if (uploadedFiles.length >= 1 || files.length > 1) {
+                 // If trying to add more, replace the existing one or alert
+                 // Let's replace for better UX if it's a new selection, but if dragging 2, reject.
+                 if (files.length > 1) return; 
+                 uploadedFiles = []; // Replace existing
+             }
         }
+        
+        Array.from(files).forEach(file => {
+            if (file.type === 'application/pdf') {
+                uploadedFiles.push(file);
+            } else {
+                alert(`Skipped ${file.name}: Only PDF allowed`);
+            }
+        });
+        renderFileList();
+        updateNextButton();
+    };
 
         function renderFileList() {
             if (!fileList) return;
@@ -275,7 +627,7 @@ const App = (function() {
                 });
 
                 try {
-                    const res = await fetch('http://localhost:3000/api/shortlist', {
+                    const res = await fetch('http://localhost:5000/api/shortlist', {
                         method: 'POST',
                         body: formData,
                         credentials: 'include'
@@ -290,13 +642,24 @@ const App = (function() {
                     if (!res.ok) throw new Error('Processing failed');
 
                     const data = await res.json();
+                    console.log('API Response:', data); // DEBUG
                     
                     // Store results and jobId
-                    sessionStorage.setItem(STATE_KEY_RESULTS, JSON.stringify(data.data));
+                    if (data.data) {
+                        sessionStorage.setItem(STATE_KEY_RESULTS, JSON.stringify(data.data));
+                        console.log('Saved to SessionStorage:', data.data); // DEBUG
+                    } else {
+                        console.error('API returned no data property');
+                    }
                     sessionStorage.setItem('currentJobId', data.jobId);
                     
                     // Navigate
-                    loadPage('result.html');
+                    if (currentUser && currentUser.role === 'student') {
+                        console.log('Redirecting to result-student.html'); // DEBUG
+                        loadPage('result-student.html');
+                    } else {
+                        loadPage('result.html');
+                    }
 
                 } catch (error) {
                     console.error(error);
@@ -466,7 +829,7 @@ const App = (function() {
                     // Persist to backend if jobId is available
                     if (jobId) {
                         try {
-                            const res = await fetch(`http://localhost:3000/api/jobs/${jobId}/candidates/${encodeURIComponent(fileName)}/status`, {
+                            const res = await fetch(`http://localhost:5000/api/jobs/${jobId}/candidates/${encodeURIComponent(fileName)}/status`, {
                                 method: 'PATCH',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ status: newStatus }),
@@ -497,12 +860,67 @@ const App = (function() {
         renderCandidates('all');
     };
 
+    const initStudentResult = () => {
+        console.log('initStudentResult called (Final)');
+        const storageData = sessionStorage.getItem(STATE_KEY_RESULTS);
+        if (!storageData) { console.warn('No storage data'); return; }
+
+        let results = [];
+        try { results = JSON.parse(storageData); } catch(e) { console.error('Parse error', e); return; }
+        
+        // Handle both array and object wrapper from API
+        if (!Array.isArray(results) && results.data) results = results.data;
+        if (!Array.isArray(results)) results = [results]; // worst case
+
+        if (results.length === 0) { console.warn('Empty results'); return; }
+
+        const data = results[0];
+        console.log('Rendering Data:', data);
+
+        // Badge
+        const badge = document.getElementById('selectionBadge');
+        if (badge) {
+            badge.textContent = (data.selectionChance || 'Low') + " SELECTION CHANCE";
+            badge.className = 'badge ' + (data.selectionChance === 'High' ? 'badge-success' : (data.selectionChance === 'Medium' ? 'badge-warning' : 'badge-danger'));
+            badge.style.fontSize = '1rem'; badge.style.padding = '0.5rem 1rem'; badge.style.marginBottom = '2rem';
+        }
+
+        // Score
+        const scoreEl = document.getElementById('atsScore');
+        if (scoreEl) {
+            scoreEl.textContent = Math.round(data.matchPercentage || 0);
+            // Gauge
+            setTimeout(() => {
+                const gauge = document.getElementById('gaugeFill');
+                if (gauge) {
+                    const deg = 180 * ((data.matchPercentage || 0) / 100);
+                    gauge.style.transform = `rotate(${deg}deg)`;
+                }
+            }, 100);
+        }
+
+        // Lists
+        const tipsList = document.getElementById('improvementTips');
+        if (tipsList) tipsList.innerHTML = (data.improvementTips || []).map(t => `<li class="mb-2">${t}</li>`).join('') || '<li class="text-muted">No tips.</li>';
+
+        const missingList = document.getElementById('missingSkills');
+        if (missingList) missingList.innerHTML = (data.missingSkills || []).map(s => `<span class="badge badge-danger">+ ${s}</span>`).join('') || '<span class="text-muted">None.</span>';
+
+        const prosList = document.getElementById('prosList');
+        if (prosList) prosList.innerHTML = (data.pros || []).map(p => `<li class="mb-2">${p}</li>`).join('');
+    };
+
     return {
         initUpload,
         initJob,
         initResults,
+        initStudentResult,
         loadPage,
         removeFile,
-        initAuth
+        initAuth,
+        initHRDashboard,
+        initStudentDashboard,
+        getAnalysisResults: () => JSON.parse(sessionStorage.getItem(STATE_KEY_RESULTS) || '[]'),
+        viewJobResults
     };
 })();

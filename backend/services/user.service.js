@@ -1,67 +1,81 @@
-const fs = require('fs').promises;
-const path = require('path');
+const { db } = require('../config/firebase');
 const bcrypt = require('bcryptjs');
 
-const USERS_FILE = path.join(__dirname, '../data/users.json');
-
-const readUsers = async () => {
-    try {
-        const data = await fs.readFile(USERS_FILE, 'utf8');
-        return JSON.parse(data);
-    } catch (error) {
-        // If file doesn't exist, return empty array
-        return [];
-    }
-};
-
-const writeUsers = async (users) => {
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
-};
+const COLLECTION = 'users';
 
 const createUser = async (userData) => {
-    const users = await readUsers();
-    
-    // Check if user exists
-    if (users.find(u => u.email === userData.email)) {
-        throw new Error('User already exists');
-    }
+    // Firebase Mode Only
+    const existing = await findUserByEmail(userData.email);
+    if (existing) throw new Error('User already exists');
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    
+
+    const docRef = db.collection(COLLECTION).doc();
     const newUser = {
-        id: Date.now().toString(),
+        id: docRef.id,
         name: userData.name,
         email: userData.email,
         password: hashedPassword,
+        role: userData.role || 'student',
         createdAt: new Date().toISOString()
     };
-
-    users.push(newUser);
-    await writeUsers(users);
-    
-    // Return user without password
-    const { password, ...userWithoutPassword } = newUser;
-    return userWithoutPassword;
+    await docRef.set(newUser);
+    const { password, ...userSafe } = newUser;
+    return userSafe;
 };
 
 const findUserByEmail = async (email) => {
-    const users = await readUsers();
-    return users.find(u => u.email === email);
+    const snapshot = await db.collection(COLLECTION).where('email', '==', email).limit(1).get();
+    if (snapshot.empty) return null;
+    return snapshot.docs[0].data();
 };
 
 const findUserById = async (id) => {
-    const users = await readUsers();
-    return users.find(u => u.id === id);
+    const doc = await db.collection(COLLECTION).doc(id).get();
+    if (!doc.exists) return null;
+    return doc.data();
 };
 
 const validatePassword = async (user, password) => {
     return await bcrypt.compare(password, user.password);
 };
 
+// Create OAuth user (no password required)
+const createOAuthUser = async (userData) => {
+    const existing = await findUserByEmail(userData.email);
+    if (existing) return existing; // Return existing user
+
+    const docRef = db.collection(COLLECTION).doc();
+    const newUser = {
+        id: docRef.id,
+        name: userData.name,
+        email: userData.email,
+        role: userData.role || 'student',
+        oauthProvider: userData.provider,
+        photoURL: userData.photoURL || null,
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
+    };
+    await docRef.set(newUser);
+    return newUser;
+};
+
+// Update user
+const updateUser = async (userId, updates) => {
+    const docRef = db.collection(COLLECTION).doc(userId);
+    await docRef.update({
+        ...updates,
+        updatedAt: new Date().toISOString()
+    });
+    const doc = await docRef.get();
+    return doc.data();
+};
+
 module.exports = {
     createUser,
     findUserByEmail,
     findUserById,
-    validatePassword
+    validatePassword,
+    createOAuthUser,
+    updateUser
 };

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analysis - ResumeAI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/theme.js"></script>
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="navbar-content">
+                <a href="#" onclick="App.loadPage('index.html'); return false;" class="brand">
+                    <span>⚡</span> ResumeAI
+                </a>
+                <button onclick="App.loadPage('dashboard-student.html')" class="btn btn-ghost btn-sm">
+                    <span>←</span> Dashboard
+                </button>
+                <button id="themeToggle" class="btn btn-ghost btn-icon" title="Toggle theme" style="padding: 0.5rem; width: 40px; height: 40px;">
+                    <span class="theme-icon-light" style="font-size: 1.25rem;">🌙</span>
+                    <span class="theme-icon-dark" style="display: none; font-size: 1.25rem;">☀️</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="container section" style="max-width: 1000px;">
+            <!-- Header -->
+            <div class="text-center mb-8 fade-in">
+                <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Your Resume Analysis</h1>
+                <p class="text-lg text-secondary">Detailed insights to improve your chances</p>
+            </div>
+
+            <!-- Score Card -->
+            <div class="card scale-in mb-8" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); text-align: center; padding: 3rem 2rem; border: 2px solid var(--border);">
+                <!-- Selection Chance Badge -->
+                <div class="mb-6">
+                    <div id="selectionBadge" class="badge badge-warning" style="font-size: 1rem; padding: 0.75rem 1.5rem;">
+                        Analyzing...
+                    </div>
+                </div>
+                
+                <!-- Animated Circular Gauge -->
+                <div style="position: relative; width: 220px; height: 220px; margin: 0 auto 2rem;">
+                    <!-- Background Circle -->
+                    <svg width="220" height="220" style="transform: rotate(-90deg);">
+                        <circle cx="110" cy="110" r="95" fill="none" stroke="#e2e8f0" stroke-width="20"></circle>
+                        <circle id="scoreCircle" cx="110" cy="110" r="95" fill="none" stroke="url(#gradient)" stroke-width="20" 
+                                stroke-dasharray="597" stroke-dashoffset="597" 
+                                style="transition: stroke-dashoffset 1.5s ease-out;" stroke-linecap="round"></circle>
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    
+                    <!-- Score Text -->
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                        <div id="atsScore" style="font-size: 4rem; font-weight: 800; line-height: 1; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                            0
+                        </div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.5rem;">
+                            ATS Score
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-secondary" style="max-width: 500px; margin: 0 auto;">
+                    Your resume has been analyzed against industry standards and ATS requirements.
+                </p>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="card mb-2" style="padding: 0; overflow: hidden;">
+                <div class="flex" style="border-bottom: 2px solid var(--border);" id="tabNav">
+                    <button class="tab-btn active" data-tab="overview" style="flex: 1; padding: 1rem; border: none; background: transparent; font-weight: 600; cursor: pointer; transition: all 0.2s; border-bottom: 3px solid var(--primary);">
+                        📊 Overview
+                    </button>
+                    <button class="tab-btn" data-tab="improvements" style="flex: 1; padding: 1rem; border: none; background: transparent; font-weight: 600; cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; color: var(--text-muted);">
+                        🚀 Improvements
+                    </button>
+                    <button class="tab-btn" data-tab="missing" style="flex: 1; padding: 1rem; border: none; background: transparent; font-weight: 600; cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; color: var(--text-muted);">
+                        ⚠️ Missing Skills
+                    </button>
+                    <button class="tab-btn" data-tab="strengths" style="flex: 1; padding: 1rem; border: none; background: transparent; font-weight: 600; cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; color: var(--text-muted);">
+                        ✅ Strengths
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="tabContent">
+                <!-- Overview Tab -->
+                <div class="tab-panel active" data-panel="overview">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="stat-card">
+                            <div class="stat-label">Match Score</div>
+                            <div class="stat-value" id="overviewScore">--</div>
+                            <p class="text-sm text-muted mt-2">Based on ATS analysis</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Selection Chance</div>
+                            <div class="stat-value" style="font-size: 2rem;" id="overviewChance">--</div>
+                            <p class="text-sm text-muted mt-2">Probability estimate</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Missing Keywords</div>
+                            <div class="stat-value" style="font-size: 2rem; color: var(--danger);" id="overviewMissing">--</div>
+                            <p class="text-sm text-muted mt-2">Skills to add</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-6" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd;">
+                        <div class="flex items-start gap-3">
+                            <div style="width: 48px; height: 48px; background: #0ea5e9; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                                💡
+                            </div>
+                            <div>
+                                <h3 class="font-semibold mb-2" style="color: #0369a1;">Quick Summary</h3>
+                                <p class="text-secondary">
+                                    Your resume shows strong potential. Focus on adding the missing keywords and implementing the suggested improvements to maximize your chances of getting shortlisted.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Improvements Tab -->
+                <div class="tab-panel" data-panel="improvements" style="display: none;">
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <span style="font-size: 1.5rem;">🚀</span>
+                            Actionable Improvement Plan
+                        </h3>
+                        <ul id="improvementTips" class="flex flex-col gap-3">
+                            <!-- Injected by JS -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Missing Skills Tab -->
+                <div class="tab-panel" data-panel="missing" style="display: none;">
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <span style="font-size: 1.5rem;">⚠️</span>
+                            Keywords to Add
+                        </h3>
+                        <p class="text-secondary mb-4">
+                            These skills and keywords are present in the job description but missing from your resume. Consider adding them if you have relevant experience.
+                        </p>
+                        <div id="missingSkills" class="flex flex-wrap gap-2">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strengths Tab -->
+                <div class="tab-panel" data-panel="strengths" style="display: none;">
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <span style="font-size: 1.5rem;">✅</span>
+                            Your Strong Points
+                        </h3>
+                        <ul id="prosList" class="flex flex-col gap-3">
+                            <!-- Injected by JS -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-center gap-4 mt-8 flex-wrap">
+                <button onclick="App.loadPage('upload.html')" class="btn btn-primary btn-lg">
+                    <span>📄</span> Analyze Another Resume
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="window.print()">
+                    <span>📥</span> Download Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .tab-btn:hover {
+            background: var(--gray-50);
+            color: var(--text-primary) !important;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary) !important;
+            border-bottom-color: var(--primary) !important;
+            background: var(--primary-light);
+        }
+        
+        .tab-panel {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        #improvementTips li,
+        #prosList li {
+            padding: 1rem;
+            background: var(--gray-50);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+        }
+        
+        #missingSkills .badge {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+    </style>
+
+    <script>
+        // Tab switching logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.dataset.tab;
+                    
+                    // Update buttons
+                    tabBtns.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.borderBottomColor = 'transparent';
+                        b.style.background = 'transparent';
+                        b.style.color = 'var(--text-muted)';
+                    });
+                    btn.classList.add('active');
+                    btn.style.borderBottomColor = 'var(--primary)';
+                    btn.style.background = 'var(--primary-light)';
+                    btn.style.color = 'var(--primary)';
+                    
+                    // Update panels
+                    tabPanels.forEach(panel => {
+                        panel.style.display = 'none';
+                    });
+                    document.querySelector(`[data-panel="${targetTab}"]`).style.display = 'block';
+                });
+            });
+            
+            // Initialize the student result display
+            if (typeof App !== 'undefined' && App.initStudentResult) {
+                App.initStudentResult();
+            }
+        });
+    </script>
+</body>
+</html>

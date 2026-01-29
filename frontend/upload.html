@@ -3,46 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload - ResumeAI</title>
+    <title>Upload Resume - ResumeAI</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/theme.js"></script>
     <script src="js/app.js" defer></script>
 </head>
 <body>
-     <div id="app">
-        <!-- Navbar -->
+    <div id="app">
+        <!-- Navigation -->
         <nav class="navbar">
             <div class="navbar-content">
-                <a href="#" onclick="App.loadPage('dashboard.html'); return false;" class="brand">
-                    <span style="font-size: 1.5rem;">⚡</span> ResumeAI
+                <a href="#" onclick="App.loadPage('dashboard-student.html'); return false;" class="brand">
+                    <span>⚡</span> ResumeAI
                 </a>
-                <button onclick="App.loadPage('dashboard.html')" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">← Back to Dashboard</button>
-            </div>
-        </nav>
-
-        <div class="container">
-             <!-- Upload Application Section -->
-             <div class="upload-card" style="max-width:800px; margin:0 auto; text-align:center;">
-                <h2>Upload Resumes</h2>
-                <p style="color:var(--text-muted); margin-bottom: 2rem;">Select candidate resumes to begin analysis.</p>
-                
-                <div id="dropZone" style="border: 2px dashed #cbd5e1; border-radius: var(--radius-lg); padding: 4rem 2rem; background: #ffff; cursor: pointer; transition: all 0.2s ease;">
-                    <div style="font-size: 4rem; margin-bottom: 1rem;">📂</div>
-                    <h3>Drag & Drop Resumes</h3>
-                    <p style="color:var(--text-secondary);">Supported format: PDF (Max 10MB)</p>
-                    <input type="file" id="fileInput" name="resumes" multiple accept=".pdf" style="display:none;">
-                </div>
-
-                <ul class="file-list" id="fileList" style="list-style: none; margin-top: 2rem; text-align: left;">
-                    <!-- File items will appear here -->
-                </ul>
-
-                <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
-                    <button id="nextBtn" class="btn btn-primary" disabled>
-                        Continue to Job Details <span style="margin-left:5px">→</span>
+                <div class="flex gap-4 items-center">
+                    <button id="themeToggle" class="btn btn-ghost btn-icon" title="Toggle theme" style="padding: 0.5rem; width: 40px; height: 40px;">
+                        <span class="theme-icon-light" style="font-size: 1.25rem;">🌙</span>
+                        <span class="theme-icon-dark" style="display: none; font-size: 1.25rem;">☀️</span>
+                    </button>
+                    <button onclick="App.loadPage('dashboard-student.html')" class="btn btn-ghost btn-sm">
+                        <span>←</span> Dashboard
                     </button>
                 </div>
             </div>
+        </nav>
+
+        <div class="container section" style="max-width: 900px;">
+            <!-- Header -->
+            <div class="text-center mb-8 fade-in">
+                <div class="badge badge-primary mb-4" style="font-size: 0.875rem;">
+                    Step 1 of 2
+                </div>
+                <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Upload Your Resume</h1>
+                <p class="text-lg text-secondary" style="max-width: 600px; margin: 0 auto;">
+                    Upload your resume in PDF format to get instant AI-powered analysis and personalized feedback.
+                </p>
+            </div>
+
+            <!-- Upload Card -->
+            <div class="card scale-in" style="padding: 2rem;">
+                <!-- Drag & Drop Zone -->
+                <div id="dropZone" class="upload-zone" style="position: relative; overflow: hidden;">
+                    <div class="upload-zone-icon">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto; color: var(--primary); opacity: 0.6;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 0.75rem; color: var(--text-primary);">
+                        Drag & Drop Your Resume Here
+                    </h3>
+                    <p class="text-secondary mb-4">or click to browse from your computer</p>
+                    <input type="file" id="fileInput" accept=".pdf" multiple class="hidden">
+                    
+                    <div class="flex items-center justify-center gap-2 text-sm text-muted">
+                        <span>📄</span>
+                        <span>Supported format: PDF only</span>
+                        <span>•</span>
+                        <span>Max size: 10MB</span>
+                    </div>
+                </div>
+
+                <!-- File List -->
+                <div class="mt-6" id="fileListContainer" style="display: none;">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-semibold text-lg">Selected Files</h4>
+                        <span class="badge badge-primary" id="fileCount">0 files</span>
+                    </div>
+                    <ul id="fileList" class="flex flex-col gap-2">
+                        <!-- Files will be listed here -->
+                    </ul>
+                </div>
+
+                <!-- Info Alert -->
+                <div class="alert alert-info mt-6" style="border-left-width: 4px;">
+                    <div class="flex items-start gap-3">
+                        <span style="font-size: 1.25rem;">💡</span>
+                        <div>
+                            <h4 class="font-semibold mb-1">Tips for Best Results</h4>
+                            <ul class="text-sm flex flex-col gap-1" style="list-style: disc; padding-left: 1.25rem;">
+                                <li>Ensure your resume is text-based (not scanned images)</li>
+                                <li>Use standard fonts and clear formatting</li>
+                                <li>Include relevant keywords from your target job description</li>
+                                <li>Keep file size under 10MB for faster processing</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-between items-center mt-8 pt-6" style="border-top: 1px solid var(--border);">
+                    <button onclick="App.loadPage('dashboard-student.html')" class="btn btn-ghost">
+                        <span>←</span> Cancel
+                    </button>
+                    <button id="nextBtn" class="btn btn-primary btn-lg" disabled>
+                        Continue to Job Description
+                        <span>→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div class="flex items-start gap-3">
+                    <div style="width: 40px; height: 40px; background: var(--success-light); color: var(--success); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
+                        ✓
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-1">Secure Upload</h4>
+                        <p class="text-sm text-muted">Your data is encrypted and never shared</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div style="width: 40px; height: 40px; background: var(--info-light); color: var(--info); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
+                        ⚡
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-1">Instant Analysis</h4>
+                        <p class="text-sm text-muted">Get results in under 30 seconds</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div style="width: 40px; height: 40px; background: var(--warning-light); color: var(--warning); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
+                        🎯
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-1">AI-Powered</h4>
+                        <p class="text-sm text-muted">Advanced ML algorithms for accuracy</p>
+                    </div>
+                </div>
+            </div>
         </div>
-     </div>
+    </div>
+    
+    <style>
+        #fileList li {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border);
+            transition: all var(--transition-base);
+        }
+        
+        #fileList li:hover {
+            background: white;
+            border-color: var(--primary-light);
+            transform: translateX(4px);
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+        
+        .file-remove {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--danger-light);
+            color: var(--danger);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+        
+        .file-remove:hover {
+            background: var(--danger);
+            color: white;
+            transform: scale(1.1);
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            App.initUpload();
+            
+            // Enhanced file list rendering
+            const originalRenderFileList = window.renderFileList;
+            window.renderFileList = function() {
+                const fileList = document.getElementById('fileList');
+                const fileListContainer = document.getElementById('fileListContainer');
+                const fileCount = document.getElementById('fileCount');
+                const uploadedFiles = App.getUploadedFiles ? App.getUploadedFiles() : [];
+                
+                if (uploadedFiles && uploadedFiles.length > 0) {
+                    fileListContainer.style.display = 'block';
+                    fileCount.textContent = `${uploadedFiles.length} file${uploadedFiles.length > 1 ? 's' : ''}`;
+                    
+                    fileList.innerHTML = uploadedFiles.map((file, index) => `
+                        <li>
+                            <div class="file-info">
+                                <div class="file-icon">PDF</div>
+                                <div>
+                                    <div class="font-medium">${file.name}</div>
+                                    <div class="text-sm text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                                </div>
+                            </div>
+                            <button class="file-remove" onclick="App.removeFile(${index})" title="Remove file">
+                                ✕
+                            </button>
+                        </li>
+                    `).join('');
+                } else {
+                    fileListContainer.style.display = 'none';
+                }
+            };
+        });
+    </script>
 </body>
 </html>

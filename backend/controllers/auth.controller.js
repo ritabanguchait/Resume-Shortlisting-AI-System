@@ -11,13 +11,13 @@ const generateToken = (id) => {
 
 const signup = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, role } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({ error: 'Please provide all fields' });
         }
 
-        const user = await userService.createUser({ name, email, password });
+        const user = await userService.createUser({ name, email, password, role });
         
         // Generate token and set cookie
         const token = generateToken(user.id);
@@ -36,6 +36,9 @@ const signup = async (req, res) => {
 
     } catch (error) {
         console.error(error);
+        if (error.message.includes("Service Unavailable")) {
+             return res.status(503).json({ error: error.message });
+        }
         res.status(400).json({ error: error.message });
     }
 };

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Login - ResumeAI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/theme.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="auth-wrapper">
+            <!-- Left Side - Branding (Dark Theme) -->
+            <div class="auth-sidebar" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+                <div style="position: relative; z-index: 1;">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="brand" style="color: white; font-size: 1.75rem;">
+                            <span style="font-size: 2rem;">⚡</span> ResumeAI
+                        </div>
+                        <span class="badge" style="background: rgba(255,255,255,0.2); color: white; font-size: 0.75rem;">
+                            ENTERPRISE
+                        </span>
+                    </div>
+                    <h1 style="font-size: 2.5rem; color: white; margin-bottom: 1.5rem; line-height: 1.2;">
+                        Welcome Back,<br>Talent Leader
+                    </h1>
+                    <p style="font-size: 1.125rem; opacity: 0.95; line-height: 1.6; margin-bottom: 2rem;">
+                        Access your recruitment dashboard to manage candidates, analyze resumes, and make data-driven hiring decisions.
+                    </p>
+                    
+                    <!-- Enterprise Features -->
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center gap-3">
+                            <div style="width: 40px; height: 40px; background: rgba(79, 70, 229, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                                ⚡
+                            </div>
+                            <span style="opacity: 0.9;">Bulk Resume Processing</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div style="width: 40px; height: 40px; background: rgba(79, 70, 229, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                                📊
+                            </div>
+                            <span style="opacity: 0.9;">Advanced Analytics Dashboard</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div style="width: 40px; height: 40px; background: rgba(79, 70, 229, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                                🎯
+                            </div>
+                            <span style="opacity: 0.9;">AI-Powered Candidate Ranking</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Form -->
+            <div class="auth-form-container">
+                <!-- Theme Toggle -->
+                <div style="position: absolute; top: 1.5rem; right: 1.5rem; z-index: 10;">
+                    <button id="themeToggle" class="btn btn-ghost btn-icon" title="Toggle theme" style="padding: 0.5rem; width: 40px; height: 40px;">
+                        <span class="theme-icon-light" style="font-size: 1.25rem;">🌙</span>
+                        <span class="theme-icon-dark" style="display: none; font-size: 1.25rem;">☀️</span>
+                    </button>
+                </div>
+                
+                <div class="auth-card fade-in">
+                    <div class="mb-6">
+                        <h2 style="font-size: 1.875rem; margin-bottom: 0.5rem;">Recruiter Sign In</h2>
+                        <p class="text-secondary">
+                            New to ResumeAI? 
+                            <a href="#" onclick="App.loadPage('hr-signup.html'); return false;" class="text-primary font-semibold">Create account</a>
+                        </p>
+                    </div>
+                    
+                    <form id="loginForm" data-role="hr">
+                        <div class="form-group">
+                            <label for="email" class="form-label">Work Email</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                class="form-input" 
+                                placeholder="you@company.com" 
+                                required
+                                autocomplete="email"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="flex justify-between items-center mb-2">
+                                <label for="password" class="form-label" style="margin-bottom: 0;">Password</label>
+                                <a href="#" class="text-sm text-primary font-medium">Forgot password?</a>
+                            </div>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                class="form-input" 
+                                placeholder="Enter your password" 
+                                required
+                                autocomplete="current-password"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;">
+                                <span class="text-sm text-secondary">Keep me signed in</span>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-full" style="padding: 0.875rem; font-size: 1rem;">
+                            Access Dashboard
+                        </button>
+                        
+                        <div id="authError" class="alert alert-danger hidden" style="margin-top: 1rem;"></div>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="flex items-center gap-4 my-6">
+                        <div style="flex: 1; height: 1px; background: var(--border);"></div>
+                        <span class="text-sm text-muted">OR</span>
+                        <div style="flex: 1; height: 1px; background: var(--border);"></div>
+                    </div>
+
+                    <!-- SSO Options (Placeholder) -->
+                    <div class="flex flex-col gap-2">
+                        <button class="btn btn-secondary w-full" disabled style="opacity: 0.5;">
+                            <span>🔐</span> Sign in with SSO
+                        </button>
+                    </div>
+
+                    <div class="text-center mt-6">
+                        <a href="#" onclick="App.loadPage('index.html'); return false;" class="text-sm text-muted flex items-center justify-center gap-1">
+                            <span>←</span> Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            App.initAuth('login');
+        });
+    </script>
+</body>
+</html>

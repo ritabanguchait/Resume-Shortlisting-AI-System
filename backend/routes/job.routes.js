@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const jobService = require('../services/job.service');
-const { protect } = require('../middleware/auth.middleware');
+const { protect, authorize } = require('../middleware/auth.middleware');
 
 // Get all jobs
-router.get('/jobs', protect, async (req, res) => {
+router.get('/jobs', protect, authorize('hr'), async (req, res) => {
     try {
         const jobs = await jobService.getAllJobs();
         res.json({ success: true, data: jobs });
@@ -13,8 +13,16 @@ router.get('/jobs', protect, async (req, res) => {
     }
 });
 
-// Get specific job
-router.get('/jobs/:id', protect, async (req, res) => {
+// Get User History
+router.get('/history', protect, async (req, res) => {
+    try {
+        const jobs = await jobService.getJobsByUser(req.user.id);
+        res.json({ success: true, data: jobs });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+router.get('/jobs/:id', protect, authorize('hr'), async (req, res) => {
     try {
         const job = await jobService.getJobById(req.params.id);
         if (!job) {
@@ -27,7 +35,7 @@ router.get('/jobs/:id', protect, async (req, res) => {
 });
 
 // Update candidate status
-router.patch('/jobs/:id/candidates/:fileName/status', protect, async (req, res) => {
+router.patch('/jobs/:id/candidates/:fileName/status', protect, authorize('hr'), async (req, res) => {
     try {
         const { status } = req.body;
         if (!status) {
@@ -55,7 +63,7 @@ router.patch('/jobs/:id/candidates/:fileName/status', protect, async (req, res) 
 });
 
 // Add candidate note
-router.post('/jobs/:id/candidates/:fileName/notes', protect, async (req, res) => {
+router.post('/jobs/:id/candidates/:fileName/notes', protect, authorize('hr'), async (req, res) => {
     try {
         const { note } = req.body;
         if (!note) {

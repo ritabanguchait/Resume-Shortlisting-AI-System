@@ -4,7 +4,7 @@ const env = require('../config/env');
 
 const processResumes = (jobDescription, filePaths) => {
     return new Promise((resolve, reject) => {
-        const scriptPath = path.join(__dirname, '../../ml/resume_matcher.py');
+        const scriptPath = path.join(__dirname, '../../ml/matcher.py');
         
         // Prepare data to pass to python script
         const inputData = JSON.stringify({

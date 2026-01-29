@@ -13,7 +13,16 @@ function initResultsATS() {
     const experienceFilter = document.getElementById('experienceFilter');
     const sortSelect = document.getElementById('sortSelect');
     
-    const resultsJson = sessionStorage.getItem('analysisResults');
+    // View Toggle
+    let currentView = 'cards'; // 'cards' or 'table'
+    const viewToggleBtn = document.getElementById('viewToggleBtn');
+    if (viewToggleBtn) {
+        viewToggleBtn.addEventListener('click', () => {
+            currentView = currentView === 'cards' ? 'table' : 'cards';
+            viewToggleBtn.textContent = currentView === 'cards' ? 'Switch to Table View' : 'Switch to Card View';
+            renderCandidates();
+        });
+    }
     if (!resultsJson) {
         console.warn('No results in session storage, redirecting...');
         App.loadPage('dashboard.html');
@@ -138,8 +147,95 @@ function initResultsATS() {
         }
 
         if (noResults) noResults.style.display = 'none';
-        container.innerHTML = '';
+        
+        if (currentView === 'table') {
+            renderTable(container, filtered);
+        } else {
+            renderCards(container, filtered);
+        }
+    }
 
+    function renderStats(candidates, container) {
+        if (!container) return;
+        
+        const total = candidates.length;
+        const shortlisted = candidates.filter(c => c.status === 'Shortlisted' || c.matchPercentage >= 50).length;
+        const avgScore = Math.round(candidates.reduce((acc, c) => acc + c.matchPercentage, 0) / (total || 1));
+        const highPotential = candidates.filter(c => c.matchPercentage >= 75).length;
+
+        container.innerHTML = `
+            <div class="card text-center">
+                <div class="stat-value text-primary">${total}</div>
+                <div class="stat-label">Total Applications</div>
+            </div>
+            <div class="card text-center">
+                <div class="stat-value text-success">${shortlisted}</div>
+                <div class="stat-label">Shortlisted</div>
+            </div>
+            <div class="card text-center">
+                <div class="stat-value">${avgScore}%</div>
+                <div class="stat-label">Avg. Match Score</div>
+            </div>
+            <div class="card text-center">
+                <div class="stat-value text-warning">${highPotential}</div>
+                <div class="stat-label">High Potential</div>
+            </div>
+        `;
+    }
+
+    function renderTable(container, candidates) {
+        // Use card-based table for better aesthetics in the new design
+        const html = `
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="padding-left: 1.5rem;">Rank</th>
+                            <th>Candidate</th>
+                            <th>Match Score</th>
+                            <th>Experience</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${candidates.map((c, i) => `
+                            <tr>
+                                <td style="padding-left: 1.5rem;">
+                                    <span style="font-weight:700; color:var(--text-muted);">#${i + 1}</span>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-main);">${c.fileName}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">${c.skills.length} skills detected</div>
+                                </td>
+                                <td>
+                                    <span class="badge ${c.matchPercentage >= 75 ? 'badge-success' : (c.matchPercentage >= 50 ? 'badge-warning' : 'badge-danger')}">
+                                        ${c.matchPercentage}%
+                                    </span>
+                                </td>
+                                <td>${c.experienceYears} Years</td>
+                                <td>
+                                    <select class="form-input status-select" data-filename="${c.fileName}" style="padding: 0.25rem 0.5rem; font-size: 0.85rem; width: auto;">
+                                        <option value="Applied" ${c.status === 'Applied' ? 'selected' : ''}>Applied</option>
+                                        <option value="Shortlisted" ${c.status === 'Shortlisted' ? 'selected' : ''}>Shortlisted</option>
+                                        <option value="Rejected" ${c.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <a href="${c.downloadLink}" class="btn btn-secondary btn-sm" style="padding: 0.25rem 0.5rem;">Download</a>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        container.innerHTML = html;
+        attachStatusListeners();
+    }
+
+    function renderCards(container, filtered) {
+        container.innerHTML = '';
         filtered.forEach((c, index) => {
             const scoreClass = getScoreClass(c.matchPercentage);
             const scoreLabel = getScoreLabel(c.matchPercentage);
@@ -171,162 +267,72 @@ function initResultsATS() {
                             </div>
                         </div>
                         <div class="candidate-meta">
-                            ${c.experienceYears ? `
+                             ${c.experienceYears ? `
                                 <div class="meta-item" style="background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 6px;">
-                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #667eea;">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                                    </svg>
                                     <span style="font-weight: 600; color: #475569;">${c.experienceYears} Years</span>
                                     <span style="color: #94a3b8;">Experience</span>
                                 </div>
                             ` : ''}
                             <div class="meta-item" style="background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 6px;">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #667eea;">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                </svg>
                                 <span style="font-weight: 600; color: #475569;">Rank ${index + 1}</span>
                                 <span style="color: #94a3b8;">of ${filtered.length}</span>
-                            </div>
-                            <div class="meta-item" style="background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 6px;">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #667eea;">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polyline points="12 6 12 12 16 14"></polyline>
-                                </svg>
-                                <span style="color: #475569;">${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                             </div>
                         </div>
                     </div>
                     <div class="score-display">
-                        <div class="score-circle ${scoreClass}" style="position: relative;">
-                            <div style="position: absolute; inset: 0; border-radius: 50%; background: rgba(255,255,255,0.1);"></div>
+                        <div class="score-circle ${scoreClass}">
                             <div style="position: relative; z-index: 1;">${c.matchPercentage}%</div>
                         </div>
-                        <div class="score-label ${labelClass}" style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
-                            ${scoreLabel === 'Excellent Match' ? '⭐' : scoreLabel === 'Good Match' ? '👍' : scoreLabel === 'Fair Match' ? '⚠️' : '❌'}
-                            <span>${scoreLabel}</span>
+                        <div class="text-xs text-center mt-1 text-muted">
+                           Sem: ${c.semanticScore || '-'}% | Skill: ${c.skillScore || '-'}%
+                        </div>
+                        <div class="score-label ${labelClass}" style="margin-top: 0.5rem;">
+                            ${scoreLabel}
                         </div>
                     </div>
                 </div>
 
-                ${(c.skills && c.skills.length > 0) || (c.extraSkills && c.extraSkills.length > 0) ? `
-                    <div class="skills-section" style="border-top: 2px solid #f1f5f9; padding-top: 1.5rem; margin-top: 1.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #667eea;">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <div class="skills-header" style="margin: 0;">Skills & Competencies</div>
-                            <div style="flex: 1;"></div>
-                            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">${(c.skills || []).length + (c.extraSkills || []).length} Total</span>
-                        </div>
+                <!-- Skills Section -->
+                ${(c.skills && c.skills.length > 0) ? `
+                    <div class="skills-section" style="border-top: 2px solid #f1f5f9; padding-top: 1rem; margin-top: 1rem;">
                         <div class="skills-container">
-                            ${(c.skills || []).map(skill => `
-                                <span class="skill-badge skill-matched" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-                                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    ${skill}
-                                </span>
+                            ${(c.skills || []).slice(0, 8).map(skill => `
+                                <span class="skill-badge skill-matched">${skill}</span>
                             `).join('')}
-                            ${(c.extraSkills || []).map(skill => `
-                                <span class="skill-badge skill-extra" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-                                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
-                                    </svg>
-                                    ${skill}
-                                </span>
-                            `).join('')}
+                             ${c.skills.length > 8 ? `<span class="skill-badge">+${c.skills.length - 8} more</span>` : ''}
                         </div>
                     </div>
                 ` : ''}
 
-                ${c.missingSkills && c.missingSkills.length > 0 ? `
-                    <div style="margin-top: 1.5rem; padding: 1.25rem; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 4px solid #ef4444; border-radius: 8px; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);">
-                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20" style="color: #dc2626;">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                            </svg>
-                            <div style="font-size: 0.9rem; font-weight: 700; color: #991b1b;">Missing Required Skills</div>
-                            <div style="flex: 1;"></div>
-                            <span style="background: #dc2626; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">${c.missingSkills.length}</span>
-                        </div>
-                        <div class="skills-container">
-                            ${c.missingSkills.map(skill => `
-                                <span class="skill-badge skill-missing" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-                                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                                    </svg>
-                                    ${skill}
-                                </span>
-                            `).join('')}
-                        </div>
+                <!-- Actions -->
+                <div class="candidate-actions" style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                     <select class="status-dropdown status-select" data-filename="${c.fileName}">
+                        <option value="Applied" ${c.status === 'Applied' ? 'selected' : ''}>Applied</option>
+                        <option value="Shortlisted" ${c.status === 'Shortlisted' ? 'selected' : ''}>Shortlisted</option>
+                        <option value="Rejected" ${c.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                    </select>
+                    <div>
+                        <button class="btn btn-secondary btn-sm" onclick="toggleCandidateDetails(${index})">Details</button>
+                        <a href="${c.downloadLink}" target="_blank" class="btn btn-primary btn-sm">PDF</a>
                     </div>
-                ` : ''}
-
-                <div class="candidate-actions" style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <label style="font-size: 0.85rem; font-weight: 600; color: #475569; white-space: nowrap;">Status:</label>
-                        <select class="status-dropdown status-select" data-filename="${c.fileName}" style="flex: 1;">
-                            <option value="Applied" ${c.status === 'Applied' ? 'selected' : ''}>📝 Applied</option>
-                            <option value="Shortlisted" ${c.status === 'Shortlisted' ? 'selected' : ''}>✅ Shortlisted</option>
-                            <option value="Interview" ${c.status === 'Interview' ? 'selected' : ''}>📞 Interview</option>
-                            <option value="Offer" ${c.status === 'Offer' ? 'selected' : ''}>🎉 Offer</option>
-                            <option value="Rejected" ${c.status === 'Rejected' ? 'selected' : ''}>❌ Rejected</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-secondary" onclick="toggleCandidateDetails(${index})" style="white-space: nowrap;">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        View Details
-                    </button>
-                    <a href="${c.downloadLink}" target="_blank" class="btn btn-primary" style="text-decoration: none; white-space: nowrap;">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        Download
-                    </a>
                 </div>
-
-                <div id="details-${index}" class="details-section">
-                    <div class="details-grid">
-                        <div class="details-column" style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); padding: 1.5rem; border-radius: 8px; border: 1px solid #a7f3d0;">
-                            <h4 style="color: #059669; display: flex; align-items: center; gap: 0.75rem;">
-                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                                Strengths & Highlights
-                            </h4>
-                            <ul style="margin-top: 1rem;">
-                                ${(c.pros || []).map(p => `<li style="color: #065f46;">• ${p}</li>`).join('') || '<li style="color: #6ee7b7;">No specific strengths noted</li>'}
-                            </ul>
+                
+                <div id="details-${index}" class="details-section" style="display:none;">
+                    <!-- Details Content -->
+                     <div class="details-grid">
+                        <div class="details-column">
+                            <h4 class="text-success">Strengths</h4>
+                            <ul>${(c.pros || []).map(p => `<li>${p}</li>`).join('')}</ul>
                         </div>
-                        <div class="details-column" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 1.5rem; border-radius: 8px; border: 1px solid #fca5a5;">
-                            <h4 style="color: #dc2626; display: flex; align-items: center; gap: 0.75rem;">
-                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                </svg>
-                                Areas for Improvement
-                            </h4>
-                            <ul style="margin-top: 1rem;">
-                                ${(c.cons || []).map(co => `<li style="color: #991b1b;">• ${co}</li>`).join('') || '<li style="color: #fca5a5;">No specific concerns noted</li>'}
-                            </ul>
+                        <div class="details-column">
+                            <h4 class="text-danger">Weaknesses</h4>
+                            <ul>${(c.cons || []).map(co => `<li>${co}</li>`).join('')}</ul>
                         </div>
                     </div>
                 </div>
             `;
-
             container.appendChild(card);
         });
-
-        // Add status change listeners
         attachStatusListeners();
     }
 
@@ -370,7 +376,7 @@ function initResultsATS() {
                 
                 if (jobId) {
                     try {
-                        const res = await fetch(`http://localhost:3000/api/jobs/${jobId}/candidates/${encodeURIComponent(fileName)}/status`, {
+                        const res = await fetch(`http://localhost:5000/api/jobs/${jobId}/candidates/${encodeURIComponent(fileName)}/status`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ status: newStatus }),

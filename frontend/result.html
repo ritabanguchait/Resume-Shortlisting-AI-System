@@ -3,457 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candidate Results - ATS Dashboard</title>
+    <title>Candidate Results - ResumeAI</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/theme.js"></script>
     <script src="js/app.js" defer></script>
     <script src="js/results-ats.js" defer></script>
-    <style>
-        body {
-            background: #f8fafc;
-        }
-        .ats-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .ats-header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        .ats-header h1 {
-            margin: 0 0 0.5rem 0;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-        .ats-header p {
-            margin: 0;
-            opacity: 0.95;
-            font-size: 1.05rem;
-        }
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem 3rem 2rem;
-        }
-        .ats-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .stat-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-left: 4px solid #667eea;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-        }
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #667eea;
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-        .stat-label {
-            font-size: 0.95rem;
-            color: #64748b;
-            font-weight: 500;
-        }
-        .search-filter-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        .search-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .search-box {
-            position: relative;
-            flex: 1;
-            min-width: 300px;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 0.875rem 1rem 0.875rem 3rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-        .search-box input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.25rem;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 0.75rem;
-        }
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-        .filter-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .filter-item label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .filter-item select {
-            padding: 0.75rem 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            background: white;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-        .filter-item select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .candidate-card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s;
-        }
-        .candidate-card:hover {
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-        .candidate-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
-            gap: 2rem;
-        }
-        .candidate-info {
-            flex: 1;
-        }
-        .candidate-info h3 {
-            margin: 0 0 0.75rem 0;
-            font-size: 1.25rem;
-            color: #1e293b;
-            font-weight: 600;
-        }
-        .candidate-meta {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .score-display {
-            text-align: center;
-            min-width: 140px;
-        }
-        .score-circle {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin: 0 auto 0.5rem auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .score-excellent {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-        .score-good {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-        }
-        .score-fair {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
-        .score-poor {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-        }
-        .score-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .label-excellent { color: #10b981; }
-        .label-good { color: #3b82f6; }
-        .label-fair { color: #f59e0b; }
-        .label-poor { color: #ef4444; }
-        .skills-section {
-            margin: 1.5rem 0;
-            padding: 1.5rem;
-            background: #f8fafc;
-            border-radius: 8px;
-        }
-        .skills-header {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            margin-bottom: 0.75rem;
-            letter-spacing: 0.5px;
-        }
-        .skills-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        .skill-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: transform 0.2s;
-        }
-        .skill-badge:hover {
-            transform: scale(1.05);
-        }
-        .skill-matched {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #93c5fd;
-        }
-        .skill-extra {
-            background: #f3e8ff;
-            color: #6b21a8;
-            border: 1px solid #d8b4fe;
-        }
-        .skill-missing {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fca5a5;
-        }
-        .candidate-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 2px solid #f1f5f9;
-            flex-wrap: wrap;
-        }
-        .status-dropdown {
-            padding: 0.75rem 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            background: white;
-            cursor: pointer;
-            min-width: 180px;
-        }
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-        .btn-secondary {
-            background: white;
-            color: #475569;
-            border: 2px solid #e2e8f0;
-        }
-        .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-        .details-section {
-            display: none;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 2px solid #f1f5f9;
-        }
-        .details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-        .details-column h4 {
-            font-size: 1rem;
-            margin: 0 0 1rem 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .details-column ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .details-column li {
-            padding: 0.5rem 0;
-            font-size: 0.9rem;
-            color: #475569;
-            line-height: 1.6;
-        }
-        #noResults {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        #noResults h3 {
-            color: #64748b;
-            margin-bottom: 0.5rem;
-        }
-        #noResults p {
-            color: #94a3b8;
-        }
-    </style>
 </head>
-<body>
+<body style="background: var(--gray-50);">
     <div id="app">
-        <!-- Navbar -->
-        <nav class="navbar">
+        <!-- Navigation -->
+        <nav class="navbar" style="background: white; box-shadow: var(--shadow-sm);">
             <div class="navbar-content">
-                <a href="#" onclick="App.loadPage('dashboard.html'); return false;" class="brand">
+                <a href="#" onclick="App.loadPage('dashboard-hr.html'); return false;" class="brand">
                     <span>⚡</span> ResumeAI
+                    <span class="badge badge-primary ml-2" style="font-size: 0.625rem;">ENTERPRISE</span>
                 </a>
-                <div style="font-weight: 500; color: var(--text-secondary);">ATS Dashboard</div>
+                <button onclick="App.loadPage('dashboard-hr.html')" class="btn btn-ghost btn-sm">
+                    <span>←</span> Dashboard
+                </button>
+                <button id="themeToggle" class="btn btn-ghost btn-icon" title="Toggle theme" style="padding: 0.5rem; width: 40px; height: 40px;">
+                    <span class="theme-icon-light" style="font-size: 1.25rem;">🌙</span>
+                    <span class="theme-icon-dark" style="display: none; font-size: 1.25rem;">☀️</span>
+                </button>
             </div>
         </nav>
 
-        <!-- ATS Header -->
-        <div class="ats-header">
-            <div class="ats-header-content">
-                <h1>🎯 Candidate Analysis Results</h1>
-                <p>AI-powered resume screening with intelligent matching algorithms</p>
+        <!-- Header Section -->
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 3rem 0;">
+            <div class="container">
+                <div class="flex justify-between items-center flex-wrap gap-4">
+                    <div>
+                        <h1 style="font-size: 2rem; color: white; margin-bottom: 0.5rem;">Candidate Rankings</h1>
+                        <p style="opacity: 0.9; font-size: 1.125rem;">AI-powered shortlist based on semantic matching</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="btn btn-secondary" onclick="exportResults('csv')" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white;">
+                            <span>📥</span> Export CSV
+                        </button>
+                        <button class="btn btn-primary" onclick="window.print()">
+                            <span>🖨️</span> Print Report
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="main-container">
-            <!-- Stats Dashboard -->
-            <div class="ats-stats" id="statsContainer">
-                <!-- Stats will be injected here -->
-            </div>
-
-            <!-- Search and Filter Section -->
-            <div class="search-filter-section">
-                <div class="search-row">
-                    <div class="search-box">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" id="searchInput" placeholder="Search by candidate name or skills...">
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="exportResults()">📊 Export CSV</button>
-                        <button onclick="App.loadPage('dashboard.html')" class="btn btn-primary">+ New Analysis</button>
-                    </div>
+        <div class="container section">
+            <!-- Stats Overview -->
+            <div id="statsContainer" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <!-- Stats injected by JS -->
+                <div class="stat-card">
+                    <div class="stat-label">Total Candidates</div>
+                    <div class="stat-value" id="totalCount">0</div>
                 </div>
-
-                <div class="filter-grid">
-                    <div class="filter-item">
-                        <label>Status</label>
-                        <select id="statusFilter">
-                            <option value="all">All Status</option>
-                            <option value="Applied">Applied</option>
-                            <option value="Shortlisted">✅ Shortlisted</option>
-                            <option value="Interview">📞 Interview</option>
-                            <option value="Offer">🎉 Offer</option>
-                            <option value="Rejected">❌ Rejected</option>
-                        </select>
-                    </div>
-                    <div class="filter-item">
-                        <label>ATS Score Range</label>
-                        <select id="scoreFilter">
-                            <option value="all">All Scores</option>
-                            <option value="excellent">⭐ Excellent (80-100%)</option>
-                            <option value="good">👍 Good (60-79%)</option>
-                            <option value="fair">⚠️ Fair (40-59%)</option>
-                            <option value="poor">❌ Poor (0-39%)</option>
-                        </select>
-                    </div>
-                    <div class="filter-item">
-                        <label>Experience Level</label>
-                        <select id="experienceFilter">
-                            <option value="all">All Experience</option>
-                            <option value="0-2">0-2 years (Entry)</option>
-                            <option value="3-5">3-5 years (Mid)</option>
-                            <option value="6+">6+ years (Senior)</option>
-                        </select>
-                    </div>
-                    <div class="filter-item">
-                        <label>Sort By</label>
-                        <select id="sortSelect">
-                            <option value="score-desc">📊 Score (High to Low)</option>
-                            <option value="score-asc">📊 Score (Low to High)</option>
-                            <option value="name-asc">🔤 Name (A-Z)</option>
-                            <option value="name-desc">🔤 Name (Z-A)</option>
-                            <option value="experience-desc">💼 Experience (High to Low)</option>
-                            <option value="experience-asc">💼 Experience (Low to High)</option>
-                        </select>
-                    </div>
+                <div class="stat-card" style="border-left-color: var(--success);">
+                    <div class="stat-label">Shortlisted</div>
+                    <div class="stat-value" style="color: var(--success);" id="shortlistedCount">0</div>
+                </div>
+                <div class="stat-card" style="border-left-color: var(--warning);">
+                    <div class="stat-label">Under Review</div>
+                    <div class="stat-value" style="color: var(--warning);" id="reviewCount">0</div>
+                </div>
+                <div class="stat-card" style="border-left-color: var(--info);">
+                    <div class="stat-label">Avg. Match Score</div>
+                    <div class="stat-value" style="color: var(--info);" id="avgScore">--</div>
                 </div>
             </div>
 
-            <!-- Results Container -->
-            <div id="resultsContainer">
-                <!-- Candidate cards will be injected here -->
+            <!-- Filters & Search -->
+            <div class="card mb-6">
+                <div class="flex gap-4 flex-wrap items-end">
+                    <div class="flex-1" style="min-width: 250px;">
+                        <label class="form-label">Search Candidates</label>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            class="form-input" 
+                            placeholder="Search by name, skills, or experience..."
+                        >
+                    </div>
+                    <div style="min-width: 180px;">
+                        <label class="form-label">Status Filter</label>
+                        <select id="statusFilter" class="form-select">
+                            <option value="all">All Statuses</option>
+                            <option value="Shortlisted">Shortlisted</option>
+                            <option value="Under Review">Under Review</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div style="min-width: 180px;">
+                        <label class="form-label">Sort By</label>
+                        <select id="sortSelect" class="form-select">
+                            <option value="score-desc">Highest Score First</option>
+                            <option value="score-asc">Lowest Score First</option>
+                            <option value="experience-desc">Most Experienced</option>
+                            <option value="name-asc">Name (A-Z)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" onclick="resetFilters()">
+                        Reset
+                    </button>
+                </div>
             </div>
-            
-            <div id="noResults" style="display:none;">
-                <h3>🔍 No candidates match your filters</h3>
-                <p>Try adjusting your search or filter criteria to see more results</p>
+
+            <!-- Bulk Actions -->
+            <div class="card mb-6" style="background: var(--primary-light); border: 1px solid var(--primary-light);">
+                <div class="flex justify-between items-center flex-wrap gap-4">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="selectAll" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span class="font-semibold">
+                            <span id="selectedCount">0</span> candidates selected
+                        </span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn btn-sm btn-primary" onclick="bulkAction('shortlist')" disabled id="bulkShortlistBtn">
+                            <span>⭐</span> Shortlist
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="bulkAction('review')" disabled id="bulkReviewBtn">
+                            <span>👁️</span> Review
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="bulkAction('reject')" disabled id="bulkRejectBtn">
+                            <span>✕</span> Reject
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="card">
+                <div id="resultsContainer">
+                    <!-- Loading State -->
+                    <div id="loadingState" class="text-center p-8">
+                        <div class="spinner mx-auto mb-4"></div>
+                        <p class="text-muted">Loading candidate data...</p>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="text-center p-8" style="display: none;">
+                        <div style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;">👥</div>
+                        <h3 class="text-xl font-semibold mb-2">No Candidates Found</h3>
+                        <p class="text-secondary mb-4">Upload resumes to start analyzing candidates</p>
+                        <button onclick="App.loadPage('upload.html')" class="btn btn-primary">
+                            Upload Resumes
+                        </button>
+                    </div>
+
+                    <!-- Data Table -->
+                    <div id="resultsTable" style="display: none;">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;">
+                                            <input type="checkbox" class="select-all-checkbox" style="width: 16px; height: 16px; cursor: pointer;">
+                                        </th>
+                                        <th>Candidate</th>
+                                        <th>Match Score</th>
+                                        <th>Experience</th>
+                                        <th>Key Skills</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="candidatesTableBody">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- No Results (after filtering) -->
+                    <div id="noResults" class="text-center p-8" style="display: none;">
+                        <div style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;">🔍</div>
+                        <h3 class="text-lg font-semibold mb-2">No matches found</h3>
+                        <p class="text-secondary">Try adjusting your search or filter criteria</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .candidate-row {
+            transition: all 0.2s;
+        }
+        
+        .candidate-row:hover {
+            background: var(--gray-50);
+        }
+        
+        .candidate-row.selected {
+            background: var(--primary-light);
+        }
+        
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+        
+        .score-high {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .score-medium {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+        
+        .score-low {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+        
+        .skill-tag {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            background: var(--gray-100);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+    </style>
+
+    <script>
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = 'all';
+            document.getElementById('sortSelect').value = 'score-desc';
+            // Trigger re-render
+            if (window.renderResults) window.renderResults();
+        }
+        
+        function exportResults(format) {
+            alert(`Exporting results as ${format.toUpperCase()}... (Feature coming soon)`);
+        }
+        
+        function bulkAction(action) {
+            const selected = document.querySelectorAll('.candidate-checkbox:checked').length;
+            if (selected === 0) {
+                alert('Please select at least one candidate');
+                return;
+            }
+            alert(`${action} action for ${selected} candidate(s) - Feature coming soon`);
+        }
+        
+        // Selection handling
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const bulkButtons = [
+                document.getElementById('bulkShortlistBtn'),
+                document.getElementById('bulkReviewBtn'),
+                document.getElementById('bulkRejectBtn')
+            ];
+            
+            function updateBulkActions() {
+                const checkboxes = document.querySelectorAll('.candidate-checkbox');
+                const checked = document.querySelectorAll('.candidate-checkbox:checked');
+                
+                selectedCountSpan.textContent = checked.length;
+                
+                bulkButtons.forEach(btn => {
+                    btn.disabled = checked.length === 0;
+                });
+                
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = checkboxes.length > 0 && checked.length === checkboxes.length;
+                }
+            }
+            
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', (e) => {
+                    const checkboxes = document.querySelectorAll('.candidate-checkbox');
+                    checkboxes.forEach(cb => cb.checked = e.target.checked);
+                    updateBulkActions();
+                });
+            }
+            
+            // Delegate event for dynamically added checkboxes
+            document.addEventListener('change', (e) => {
+                if (e.target.classList.contains('candidate-checkbox')) {
+                    updateBulkActions();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
